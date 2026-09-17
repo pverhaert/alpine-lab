@@ -1,0 +1,6 @@
+{
+  "name": "Alpine.js Playground",
+  "description": "Interactive live coding playground for Alpine.js with Tailwind CSS v4 support, VS Code editor, snippets, and PWA capabilities.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

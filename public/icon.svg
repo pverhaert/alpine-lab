@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <!-- Background with Thomas More Signature Navy -->
+  <rect width="512" height="512" rx="128" fill="#00283c"/>
+  
+  <!-- Subtle decorative ring -->
+  <circle cx="256" cy="256" r="210" stroke="#fa6432" stroke-width="6" stroke-opacity="0.25" stroke-dasharray="8 8"/>
+  
+  <!-- Back Alpine Mountain / Chevron (Thomas More Signature Orange #fa6432) -->
+  <path d="M180 370 L280 210 L380 370 H300 L280 338 L260 370 Z" fill="#fa6432" />
+  
+  <!-- Front Alpine Mountain / Interlocking Chevron (White with clean shadow) -->
+  <path d="M290 370 L360 258 L430 370 H375 L360 346 L345 370 Z" fill="#ffffff" />
+  
+  <!-- Primary Left Chevron -->
+  <path d="M120 370 L230 195 L340 370 H270 L230 305 L190 370 Z" fill="#fa6432" fill-opacity="0.95"/>
+  
+  <!-- Accent Badge Dot -->
+  <circle cx="230" cy="195" r="14" fill="#ffffff"/>
+  <circle cx="230" cy="195" r="7" fill="#fa6432"/>
+</svg>
