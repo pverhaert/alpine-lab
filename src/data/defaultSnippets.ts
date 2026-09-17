@@ -10,160 +10,9 @@ export const DEFAULT_SNIPPETS: Snippet[] = [
     difficulty: 'Beginner',
     tags: ['x-data', 'x-on', 'x-text', 'Reactivity'],
     isDefault: true,
-    createdAt: Date.now() - 100000,
-    updatedAt: Date.now() - 100000,
-    code: `<!-- 
-  ============================================================
-  🎓 LESSON 01: STATE & EVENTS IN ALPINE.JS
-  Thomas More Applied Informatics / Tech Lab
-  ------------------------------------------------------------
-  Core Directives introduced:
-  • x-data  -> Initializes a component and defines reactive data.
-  • x-text  -> Dynamically sets the innerText of an element.
-  • x-on / @ -> Listens for native browser events (like clicks).
-  • x-bind / : -> Dynamically binds HTML attributes or classes.
-  ============================================================
--->
-
-<div class="max-w-md mx-auto p-6 bg-white rounded-2xl shadow-lg border border-slate-100 font-sans">
-  <!-- Header Branding -->
-  <div class="flex items-center gap-3 pb-4 border-b border-slate-100">
-    <div class="w-10 h-10 rounded-xl bg-[#fa6432]/10 text-[#fa6432] flex items-center justify-center font-bold text-lg">
-      TM
-    </div>
-    <div>
-      <h2 class="text-xl font-bold text-[#00283c]">Alpine.js Counter</h2>
-      <p class="text-xs text-slate-500">Thomas More Interactive Coding Lab</p>
-    </div>
-  </div>
-
-  <!--
-    [ALPINE DIRECTIVE: x-data]
-    • WHAT: Declares a new Alpine.js component scope and initializes reactive state.
-    • WHY: Any child element inside this <div> can now read and modify 'count', 'step',
-      or call functions like 'increment()' and 'reset()'.
-    • HOW: Alpine wraps this object in a JavaScript Proxy. When any property changes,
-      Alpine automatically re-renders only the elements that depend on that property.
-  -->
-  <div 
-    x-data="{ 
-      count: 0, 
-      step: 1, 
-      min: 0, 
-      max: 20,
-      increment() { 
-        if (this.count + this.step <= this.max) this.count += this.step; 
-      },
-      decrement() { 
-        if (this.count - this.step >= this.min) this.count -= this.step; 
-      },
-      reset() { 
-        this.count = 0; 
-      }
-    }" 
-    class="mt-6 space-y-6"
-  >
-    <!-- Counter Display Box -->
-    <div class="text-center p-6 bg-slate-50 rounded-xl border border-slate-200/80">
-      <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Current Value</span>
-      
-      <!--
-        [ALPINE DIRECTIVE: :class (shorthand for x-bind:class)]
-        • WHAT: Dynamically toggles CSS classes based on a JavaScript expression.
-        • WHY: Highlights the number in orange and scales it up when count reaches 15 or higher.
-
-        [ALPINE DIRECTIVE: x-text]
-        • WHAT: Safely updates the element's textContent whenever 'count' changes.
-        • WHY: Safe against XSS attacks because it sets plain text, not innerHTML.
-      -->
-      <div 
-        class="text-6xl font-black mt-2 transition-transform duration-150"
-        :class="count >= 15 ? 'text-[#fa6432] scale-105' : 'text-[#00283c]'"
-        x-text="count"
-      >
-        0
-      </div>
-
-      <!--
-        [ALPINE DIRECTIVE: x-text with JavaScript Ternary]
-        • WHAT: Demonstrates that Alpine expressions accept any standard JavaScript expression.
-        • WHY: Displays dynamic status messages ('Start', 'Counting...', 'Max Reached!') in real time.
-      -->
-      <p class="text-xs mt-2 text-slate-500">
-        Status: <span class="font-medium" x-text="count === 0 ? 'Start' : count >= max ? 'Max Reached!' : 'Counting...'"></span>
-      </p>
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="grid grid-cols-3 gap-3">
-      <!--
-        [ALPINE DIRECTIVE: @click (shorthand for x-on:click)]
-        • WHAT: Listens for user click events and executes the decrement() method.
-
-        [ALPINE DIRECTIVE: :disabled (shorthand for x-bind:disabled)]
-        • WHAT: Disables the button when count is at or below the minimum limit (0).
-        • WHY: Enforces business logic and accessibility directly in the template.
-      -->
-      <button 
-        @click="decrement()"
-        :disabled="count <= min"
-        class="py-3 px-4 rounded-xl font-bold text-base transition-all disabled:opacity-30 disabled:cursor-not-allowed bg-slate-100 text-[#00283c] hover:bg-slate-200 active:scale-95 cursor-pointer shadow-xs"
-      >
-        - <span x-text="step"></span>
-      </button>
-
-      <!--
-        [ALPINE DIRECTIVE: @click="reset()"]
-        • WHAT: Calls the reset() method to set count back to 0.
-      -->
-      <button 
-        @click="reset()"
-        class="py-3 px-4 rounded-xl font-semibold text-sm transition-all bg-slate-100 text-slate-600 hover:bg-slate-200 active:scale-95 cursor-pointer"
-      >
-        Reset
-      </button>
-
-      <!--
-        [ALPINE DIRECTIVE: @click="increment()"]
-        • WHAT: Calls increment() to add the current step amount.
-        • :disabled prevents incrementing once the maximum (20) is reached.
-      -->
-      <button 
-        @click="increment()"
-        :disabled="count >= max"
-        class="py-3 px-4 rounded-xl font-bold text-base transition-all disabled:opacity-30 disabled:cursor-not-allowed bg-[#fa6432] text-white hover:bg-[#e25325] active:scale-95 cursor-pointer shadow-md shadow-[#fa6432]/25"
-      >
-        + <span x-text="step"></span>
-      </button>
-    </div>
-
-    <!-- Step Selector -->
-    <div class="pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
-      <label for="step-select" class="font-medium">Step Increment:</label>
-      <div class="flex gap-1.5">
-        <!--
-          [ALPINE DIRECTIVE: x-for on <template>]
-          • WHAT: Loops over an array of numbers [1, 2, 5].
-          • RULE: In Alpine, x-for MUST always be placed on a <template> element.
-          • SCOPE: The loop variable 's' is available inside the template block.
-        -->
-        <template x-for="s in [1, 2, 5]">
-          <!--
-            [ALPINE DIRECTIVE: @click="step = s"]
-            • Sets the component's 'step' property to the clicked button's value.
-            • :class conditionally gives the active step an accent background.
-          -->
-          <button 
-            @click="step = s" 
-            :class="step === s ? 'bg-[#00283c] text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'"
-            class="px-2.5 py-1 rounded-md font-semibold text-xs transition cursor-pointer"
-            x-text="'+' + s"
-          ></button>
-        </template>
-      </div>
-    </div>
-  </div>
-</div>`,
+    createdAt: 1726590000000,
+    updatedAt: 1726590000000,
+    code: '<!-- \n  ============================================================\n  LESSON 01: STATE & EVENTS IN ALPINE.JS\n  Thomas More Applied Informatics / Tech Lab\n  ------------------------------------------------------------\n  Core Directives introduced:\n  - x-data  -> Initializes a component and defines reactive data.\n  - x-text  -> Dynamically sets the innerText of an element.\n  - x-on / @ -> Listens for native browser events (like clicks).\n  - x-bind / : -> Dynamically binds HTML attributes or classes.\n  ============================================================\n-->\n\n<div class="max-w-md mx-auto p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 font-sans">\n  <!-- Header Branding -->\n  <div class="flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">\n    <div class="w-10 h-10 rounded-xl bg-[#fa6432]/10 text-[#fa6432] flex items-center justify-center font-bold text-lg">\n      TM\n    </div>\n    <div>\n      <h2 class="text-xl font-bold text-[#00283c] dark:text-white">Alpine.js Counter</h2>\n      <p class="text-xs text-slate-500 dark:text-slate-400">Thomas More Interactive Coding Lab</p>\n    </div>\n  </div>\n\n  <!--\n    [ALPINE DIRECTIVE: x-data]\n    - WHAT: Declares a new Alpine.js component scope and initializes reactive state.\n    - WHY: Any child element inside this div can now read and modify \'count\', \'step\',\n      or call functions like \'increment()\' and \'reset()\'.\n    - HOW: Alpine wraps this object in a JavaScript Proxy. When any property changes,\n      Alpine automatically re-renders only the elements that depend on that property.\n  -->\n  <div \n    x-data="{ \n      count: 0, \n      step: 1, \n      min: 0, \n      max: 20,\n      increment() { \n        if (this.count + this.step <= this.max) this.count += this.step; \n      },\n      decrement() { \n        if (this.count - this.step >= this.min) this.count -= this.step; \n      },\n      reset() { \n        this.count = 0; \n      }\n    }" \n    class="mt-6 space-y-6"\n  >\n    <!-- Counter Display Box -->\n    <div class="text-center p-6 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/80 dark:border-slate-700">\n      <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Current Value</span>\n      \n      <!--\n        [ALPINE DIRECTIVE: :class (shorthand for x-bind:class)]\n        - WHAT: Dynamically toggles CSS classes based on a JavaScript expression.\n        - WHY: Highlights the number in orange and scales it up when count reaches 15 or higher.\n\n        [ALPINE DIRECTIVE: x-text]\n        - WHAT: Safely updates the element textContent whenever \'count\' changes.\n        - WHY: Safe against XSS attacks because it sets plain text, not innerHTML.\n      -->\n      <div \n        class="text-6xl font-black mt-2 transition-transform duration-150"\n        :class="count >= 15 ? \'text-[#fa6432] scale-105\' : \'text-[#00283c] dark:text-white\'"\n        x-text="count"\n      >\n        0\n      </div>\n\n      <!--\n        [ALPINE DIRECTIVE: x-text with JavaScript Ternary]\n        - WHAT: Demonstrates that Alpine expressions accept any standard JavaScript expression.\n        - WHY: Displays dynamic status messages (\'Start\', \'Counting...\', \'Max Reached!\') in real time.\n      -->\n      <p class="text-xs mt-2 text-slate-500 dark:text-slate-400">\n        Status: <span class="font-medium" x-text="count === 0 ? \'Start\' : count >= max ? \'Max Reached!\' : \'Counting...\'"></span>\n      </p>\n    </div>\n\n    <!-- Action Buttons -->\n    <div class="grid grid-cols-3 gap-3">\n      <!--\n        [ALPINE DIRECTIVE: @click (shorthand for x-on:click)]\n        - WHAT: Binds an event listener to the click event.\n        - WHY: Triggers the decrement() method defined in x-data.\n        - HOW: :disabled dynamically disables the button when the count reaches min (0).\n      -->\n      <button \n        @click="decrement()" \n        :disabled="count <= min"\n        class="px-4 py-3 bg-slate-100 dark:bg-slate-800 text-[#00283c] dark:text-slate-200 font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition active:scale-95 cursor-pointer"\n      >\n        - Decrement\n      </button>\n\n      <button \n        @click="reset()" \n        class="px-4 py-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition active:scale-95 cursor-pointer"\n      >\n        Reset\n      </button>\n\n      <button \n        @click="increment()" \n        :disabled="count >= max"\n        class="px-4 py-3 bg-[#fa6432] text-white font-bold rounded-xl hover:bg-[#e25325] disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-[#fa6432]/20 transition active:scale-95 cursor-pointer"\n      >\n        + Increment\n      </button>\n    </div>\n\n    <!-- Step Size Selector -->\n    <div class="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">\n      <span>Step Size:</span>\n      <div class="flex gap-1.5">\n        <template x-for="s in [1, 2, 5]" :key="s">\n          <button \n            @click="step = s" \n            :class="step === s ? \'bg-[#00283c] dark:bg-[#fa6432] text-white\' : \'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700\'"\n            class="px-2.5 py-1 rounded-lg font-semibold transition cursor-pointer"\n            x-text="\'+\' + s"\n          >\n          </button>\n        </template>\n      </div>\n    </div>\n  </div>\n</div>',
   },
   {
     id: 'lesson-02-forms',
@@ -173,174 +22,9 @@ export const DEFAULT_SNIPPETS: Snippet[] = [
     difficulty: 'Beginner',
     tags: ['x-model', 'Forms', 'Input', 'Two-Way Binding'],
     isDefault: true,
-    createdAt: Date.now() - 90000,
-    updatedAt: Date.now() - 90000,
-    code: `<!--
-  ============================================================
-  🎓 LESSON 02: TWO-WAY DATA BINDING WITH X-MODEL
-  Thomas More Applied Informatics / Tech Lab
-  ------------------------------------------------------------
-  Core Directives & Modifiers:
-  • x-model -> Syncs input value to variable AND variable to input.
-  • .trim   -> Automatically trims leading and trailing whitespace.
-  • @submit.prevent -> Prevents default form page reload.
-  ============================================================
--->
-
-<!--
-  [ALPINE DIRECTIVE: x-data]
-  Initializes our student registration form state with default properties.
--->
-<div 
-  x-data="{
-    studentName: 'Alex Janssen',
-    studyTrack: 'Applied Informatics',
-    campus: 'Geel',
-    isNewsletter: true,
-    skillLevel: 'Beginner',
-    bio: 'Excited to build dynamic web applications with Alpine and Tailwind!',
-    submitted: false
-  }"
-  class="max-w-lg mx-auto p-6 bg-white rounded-2xl shadow-xl border border-slate-100 font-sans"
->
-  <div class="flex items-center justify-between pb-4 border-b border-slate-100">
-    <div>
-      <span class="text-[11px] font-bold text-[#fa6432] uppercase tracking-wider">Thomas More University</span>
-      <h2 class="text-xl font-bold text-[#00283c]">Student Registration Badge</h2>
-    </div>
-    <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-[#00283c] text-white">Live Form</span>
-  </div>
-
-  <!--
-    [ALPINE DIRECTIVE: @submit.prevent]
-    • WHAT: The '.prevent' event modifier calls event.preventDefault() automatically.
-    • WHY: Prevents the browser from reloading the page when the user presses Enter or clicks Submit.
-  -->
-  <form @submit.prevent="submitted = true" class="mt-5 space-y-4">
-    <div>
-      <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
-      <!--
-        [ALPINE DIRECTIVE: x-model.trim]
-        • WHAT: Two-way binds the input's text value to 'studentName'.
-        • MODIFIER: '.trim' strips whitespace automatically as the user types.
-        • RESULT: Type here and watch the student card below update instantly!
-      -->
-      <input 
-        type="text" 
-        x-model.trim="studentName"
-        placeholder="Enter student name..." 
-        class="w-full px-3.5 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#fa6432] focus:border-transparent transition"
-      />
-    </div>
-
-    <div class="grid grid-cols-2 gap-3">
-      <div>
-        <label class="block text-xs font-semibold text-slate-700 mb-1">Study Track</label>
-        <!--
-          [ALPINE DIRECTIVE: x-model on <select>]
-          • WHAT: Binds the selected <option> value to 'studyTrack'.
-          • HOW: When a student picks a different track, 'studyTrack' updates immediately.
-        -->
-        <select 
-          x-model="studyTrack"
-          class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#fa6432] bg-white cursor-pointer"
-        >
-          <option>Applied Informatics</option>
-          <option>Digital Experience Design</option>
-          <option>Cybersecurity</option>
-          <option>Artificial Intelligence</option>
-        </select>
-      </div>
-
-      <div>
-        <label class="block text-xs font-semibold text-slate-700 mb-1">Campus</label>
-        <!--
-          [ALPINE DIRECTIVE: x-model on Campus dropdown]
-          • WHAT: Synchronizes the chosen campus location with state.
-        -->
-        <select 
-          x-model="campus"
-          class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#fa6432] bg-white cursor-pointer"
-        >
-          <option>Geel</option>
-          <option>Sint-Katelijne-Waver</option>
-          <option>Mechelen</option>
-          <option>Antwerpen</option>
-        </select>
-      </div>
-    </div>
-
-    <div>
-      <label class="block text-xs font-semibold text-slate-700 mb-1">Experience Level</label>
-      <!--
-        [ALPINE DIRECTIVE: x-model on Radio Buttons]
-        • WHAT: When multiple radio inputs share the same x-model ('skillLevel'),
-          Alpine automatically checks the radio whose 'value' matches 'skillLevel'.
-        • Selecting one sets 'skillLevel' to that option's value.
-      -->
-      <div class="flex gap-4 text-xs">
-        <label class="flex items-center gap-1.5 cursor-pointer text-slate-700">
-          <input type="radio" x-model="skillLevel" value="Beginner" class="accent-[#fa6432]"> Beginner
-        </label>
-        <label class="flex items-center gap-1.5 cursor-pointer text-slate-700">
-          <input type="radio" x-model="skillLevel" value="Intermediate" class="accent-[#fa6432]"> Intermediate
-        </label>
-        <label class="flex items-center gap-1.5 cursor-pointer text-slate-700">
-          <input type="radio" x-model="skillLevel" value="Advanced" class="accent-[#fa6432]"> Advanced
-        </label>
-      </div>
-    </div>
-
-    <div>
-      <!--
-        [ALPINE DIRECTIVE: x-model on Checkbox]
-        • WHAT: Binds directly to the boolean property 'isNewsletter'.
-        • Checked = true, Unchecked = false.
-      -->
-      <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-700">
-        <input type="checkbox" x-model="isNewsletter" class="w-4 h-4 rounded accent-[#fa6432]">
-        <span>Receive Thomas More Tech Lab Workshop Updates</span>
-      </label>
-    </div>
-  </form>
-
-  <!-- Live Student Card Preview -->
-  <div class="mt-6 p-4 rounded-xl bg-gradient-to-br from-[#00283c] to-[#0b384f] text-white shadow-md relative overflow-hidden">
-    <div class="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-[#fa6432]/20 blur-xl"></div>
-    <div class="flex justify-between items-start">
-      <div>
-        <span class="text-[10px] tracking-widest text-[#fa6432] uppercase font-bold">Thomas More ID</span>
-        <!--
-          [ALPINE DIRECTIVE: x-text with Fallback Expression]
-          • Uses JavaScript logical OR (||) to show 'Anonymous Student' if name is empty.
-        -->
-        <h3 class="text-lg font-bold text-white mt-0.5" x-text="studentName || 'Anonymous Student'"></h3>
-        <!--
-          [ALPINE DIRECTIVE: x-text with String Concatenation]
-          • Shows how track and campus are combined dynamically into a single subtitle.
-        -->
-        <p class="text-xs text-slate-300" x-text="studyTrack + ' • Campus ' + campus"></p>
-      </div>
-      <!--
-        [ALPINE DIRECTIVE: x-text on Badge]
-        • Dynamically displays Beginner, Intermediate, or Advanced from radio button choice.
-      -->
-      <span 
-        class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-[#fa6432] text-white uppercase tracking-wider"
-        x-text="skillLevel"
-      ></span>
-    </div>
-    
-    <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-300">
-      <span>Status: <strong class="text-emerald-400">Enrolled</strong></span>
-      <!--
-        [ALPINE DIRECTIVE: x-text with Boolean Ternary]
-        • Reactively reflects the checkbox status in human-readable text.
-      -->
-      <span x-text="isNewsletter ? '✉️ Subscribed to Updates' : 'No newsletter'"></span>
-    </div>
-  </div>
-</div>`,
+    createdAt: 1726590100000,
+    updatedAt: 1726590100000,
+    code: '<!-- \n  ============================================================\n  LESSON 02: TWO-WAY FORM BINDING (x-model)\n  Thomas More Applied Informatics / Tech Lab\n  ------------------------------------------------------------\n  Core Directives introduced:\n  - x-model -> Syncs HTML form inputs directly with Alpine state.\n  - Two-way binding means: typing updates the state, and code\n    updates to state immediately refresh the form inputs.\n  ============================================================\n-->\n\n<div \n  x-data="{ \n    name: \'Ada Lovelace\',\n    role: \'Full-Stack Developer\',\n    experience: \'senior\',\n    newsletter: true,\n    skills: [\'Alpine.js\', \'Tailwind CSS\'],\n    availableSkills: [\'Alpine.js\', \'Tailwind CSS\', \'TypeScript\', \'Node.js\']\n  }"\n  class="max-w-xl mx-auto p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 font-sans space-y-6"\n>\n  <!-- Header -->\n  <div class="border-b border-slate-100 dark:border-slate-800 pb-4">\n    <h2 class="text-xl font-bold text-[#00283c] dark:text-white">Developer Profile Form</h2>\n    <p class="text-xs text-slate-500 dark:text-slate-400">Two-way data binding with x-model across inputs</p>\n  </div>\n\n  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">\n    <!-- Form Controls Column -->\n    <div class="space-y-4">\n      <!--\n        [ALPINE DIRECTIVE: x-model on text input]\n        - WHAT: Two-way binds the input value to the \'name\' property.\n        - HOW: Listens to the \'input\' event under the hood and updates state on keystroke.\n      -->\n      <div>\n        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Full Name</label>\n        <input \n          type="text" \n          x-model="name"\n          placeholder="Enter your name" \n          class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:border-[#fa6432] dark:text-white"\n        />\n      </div>\n\n      <!--\n        [ALPINE DIRECTIVE: x-model on select dropdown]\n        - WHAT: Binds select option to \'experience\'.\n      -->\n      <div>\n        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Experience Level</label>\n        <select \n          x-model="experience"\n          class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:border-[#fa6432] dark:text-white"\n        >\n          <option value="junior">Junior Developer (0-2 yrs)</option>\n          <option value="mid">Mid-Level Developer (2-5 yrs)</option>\n          <option value="senior">Senior Engineer (5+ yrs)</option>\n        </select>\n      </div>\n\n      <!-- Checkboxes with Array Binding -->\n      <div>\n        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">Core Tech Stack</label>\n        <div class="space-y-1.5">\n          <template x-for="skill in availableSkills" :key="skill">\n            <label class="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300 cursor-pointer select-none">\n              <input \n                type="checkbox" \n                :value="skill" \n                x-model="skills"\n                class="rounded text-[#fa6432] focus:ring-[#fa6432] dark:bg-slate-800"\n              />\n              <span x-text="skill"></span>\n            </label>\n          </template>\n        </div>\n      </div>\n\n      <!-- Single Boolean Checkbox -->\n      <div class="pt-2">\n        <label class="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300 cursor-pointer select-none">\n          <input \n            type="checkbox" \n            x-model="newsletter"\n            class="rounded text-[#fa6432] focus:ring-[#fa6432] dark:bg-slate-800"\n          />\n          <span>Receive Tech Lab updates</span>\n        </label>\n      </div>\n    </div>\n\n    <!-- Live Preview Card Column -->\n    <div class="p-5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/80 dark:border-slate-700 flex flex-col justify-between">\n      <div>\n        <div class="flex items-center justify-between mb-3">\n          <span class="text-[10px] uppercase font-bold tracking-wider text-[#fa6432]">Live Card Preview</span>\n          <span \n            class="px-2 py-0.5 rounded-full text-[10px] font-semibold"\n            :class="experience === \'senior\' ? \'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300\' : \'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300\'"\n            x-text="experience.toUpperCase()"\n          ></span>\n        </div>\n\n        <h3 class="text-base font-bold text-[#00283c] dark:text-white" x-text="name || \'Anonymous\'"></h3>\n        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5" x-text="role"></p>\n\n        <!-- Selected Skills Badges -->\n        <div class="mt-4">\n          <span class="text-[10px] font-semibold text-slate-400 block mb-1.5">Active Skills:</span>\n          <div class="flex flex-wrap gap-1">\n            <template x-for="s in skills" :key="s">\n              <span class="px-2 py-0.5 bg-white dark:bg-slate-700 text-[#00283c] dark:text-white rounded-md text-[11px] font-medium border border-slate-200 dark:border-slate-600" x-text="s"></span>\n            </template>\n            <span x-show="skills.length === 0" class="text-[11px] text-slate-400 italic">No skills chosen</span>\n          </div>\n        </div>\n      </div>\n\n      <!-- Quick Reset Button -->\n      <button \n        @click="name = \'\'; skills = []; newsletter = false;"\n        class="mt-4 text-xs text-slate-400 hover:text-[#fa6432] transition underline cursor-pointer text-left"\n      >\n        Clear Profile\n      </button>\n    </div>\n  </div>\n</div>',
   },
   {
     id: 'lesson-03-conditionals',
@@ -351,143 +35,9 @@ export const DEFAULT_SNIPPETS: Snippet[] = [
     difficulty: 'Beginner',
     tags: ['x-show', 'x-if', 'x-cloak', 'Tabs'],
     isDefault: true,
-    createdAt: Date.now() - 80000,
-    updatedAt: Date.now() - 80000,
-    code: `<!--
-  ============================================================
-  🎓 LESSON 03: CONDITIONALS & TOGGLING IN ALPINE.JS
-  Thomas More Applied Informatics / Tech Lab
-  ------------------------------------------------------------
-  Key Differences to Understand:
-  • x-show: Toggles CSS "display: none". The DOM node stays alive,
-    preserving form inputs, cursor position, and component state.
-  • x-if: Completely creates or destroys the DOM elements.
-    Must be declared on a <template> tag!
-  ============================================================
--->
-
-<!--
-  [ALPINE DIRECTIVE: x-data]
-  • Declares 'activeTab' to control which panel is visible.
-  • 'viewCount' demonstrates that background state can still mutate.
--->
-<div 
-  x-data="{ 
-    activeTab: 'overview',
-    showDetails: true,
-    viewCount: 142
-  }"
-  class="max-w-md mx-auto p-6 bg-white rounded-2xl shadow-lg border border-slate-100 font-sans"
->
-  <div class="flex items-center justify-between mb-4">
-    <h2 class="text-lg font-bold text-[#00283c]">Web Frameworks Course</h2>
-    <span class="text-xs font-medium px-2 py-0.5 rounded bg-orange-100 text-[#fa6432]">3 ECTS</span>
-  </div>
-
-  <!-- Tab Navigation Bar -->
-  <div class="flex p-1 bg-slate-100 rounded-xl gap-1">
-    <!--
-      [ALPINE DIRECTIVE: @click & :class for Tab 1]
-      • @click="activeTab = 'overview'" changes the activeTab variable.
-      • :class highlights the button when activeTab matches 'overview'.
-    -->
-    <button 
-      @click="activeTab = 'overview'" 
-      :class="activeTab === 'overview' ? 'bg-white text-[#00283c] shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900'"
-      class="flex-1 py-2 text-xs rounded-lg transition-all cursor-pointer text-center"
-    >
-      Overview
-    </button>
-    <button 
-      @click="activeTab = 'curriculum'" 
-      :class="activeTab === 'curriculum' ? 'bg-white text-[#00283c] shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900'"
-      class="flex-1 py-2 text-xs rounded-lg transition-all cursor-pointer text-center"
-    >
-      Curriculum
-    </button>
-    <button 
-      @click="activeTab = 'grades'" 
-      :class="activeTab === 'grades' ? 'bg-white text-[#00283c] shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900'"
-      class="flex-1 py-2 text-xs rounded-lg transition-all cursor-pointer text-center"
-    >
-      Grading
-    </button>
-  </div>
-
-  <!-- Tab Content Area -->
-  <div class="mt-5 min-h-[160px]">
-    <!--
-      [ALPINE DIRECTIVE: x-show]
-      • WHAT: Toggles visibility using CSS display: none.
-      • WHY: Perfect for tabs and toggles because the elements remain rendered in the DOM.
-      • x-transition: Automatically adds a smooth fade/scale transition when opening!
-    -->
-    <div x-show="activeTab === 'overview'" x-transition class="space-y-3">
-      <h3 class="text-sm font-bold text-slate-800">Why Alpine.js?</h3>
-      <p class="text-xs text-slate-600 leading-relaxed">
-        Alpine offers the reactive power of Vue and React at a fraction of the cost. No compilation step required — perfect for rapid UI components with Tailwind CSS v4!
-      </p>
-      <div class="p-3 bg-amber-50 border border-amber-200/60 rounded-lg text-xs text-amber-900 flex items-center justify-between">
-        <span>💡 Ideal for server-rendered HTML apps</span>
-        <!--
-          [ALPINE DIRECTIVE: @click="viewCount++"]
-          • Increments the counter directly inside the template.
-        -->
-        <button @click="viewCount++" class="text-[11px] underline font-semibold cursor-pointer">
-          Views: <span x-text="viewCount"></span>
-        </button>
-      </div>
-    </div>
-
-    <!--
-      [ALPINE DIRECTIVE: x-if on <template>]
-      • WHAT: Conditionally adds or completely removes elements from the DOM tree.
-      • RULE: Must be on a <template> tag that contains a single root element.
-      • WHEN TO USE: When content is resource-heavy or should be completely unmounted when hidden.
-    -->
-    <template x-if="activeTab === 'curriculum'">
-      <div class="space-y-2">
-        <h3 class="text-sm font-bold text-slate-800">Syllabus Breakdown</h3>
-        <ul class="text-xs space-y-1.5 text-slate-600">
-          <li class="flex items-center gap-2">
-            <span class="w-1.5 h-1.5 rounded-full bg-[#fa6432]"></span>
-            Week 1: Declarative Rendering & Directives
-          </li>
-          <li class="flex items-center gap-2">
-            <span class="w-1.5 h-1.5 rounded-full bg-[#fa6432]"></span>
-            Week 2: Two-way Data Binding & Form Handling
-          </li>
-          <li class="flex items-center gap-2">
-            <span class="w-1.5 h-1.5 rounded-full bg-[#fa6432]"></span>
-            Week 3: Custom Events, Plugins, & Tailwind v4
-          </li>
-        </ul>
-      </div>
-    </template>
-
-    <!--
-      [ALPINE DIRECTIVE: x-show on Grading Tab]
-      • Smoothly fades into view when activeTab === 'grades'.
-    -->
-    <div x-show="activeTab === 'grades'" x-transition class="space-y-3">
-      <h3 class="text-sm font-bold text-slate-800">Evaluation Scheme</h3>
-      <div class="space-y-1 text-xs">
-        <div class="flex justify-between py-1 border-b border-slate-100">
-          <span class="text-slate-600">Weekly Lab Exercises</span>
-          <span class="font-bold text-[#00283c]">30%</span>
-        </div>
-        <div class="flex justify-between py-1 border-b border-slate-100">
-          <span class="text-slate-600">PWA Alpine Project</span>
-          <span class="font-bold text-[#fa6432]">40%</span>
-        </div>
-        <div class="flex justify-between py-1">
-          <span class="text-slate-600">Practical Exam</span>
-          <span class="font-bold text-[#00283c]">30%</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>`,
+    createdAt: 1726590200000,
+    updatedAt: 1726590200000,
+    code: '<!-- \n  ============================================================\n  LESSON 03: CONDITIONALS & CLOAK IN ALPINE.JS\n  Thomas More Applied Informatics / Tech Lab\n  ------------------------------------------------------------\n  Core Directives introduced:\n  - x-show   -> Toggles CSS display: none (preserves DOM elements).\n  - x-if     -> Completely adds/removes elements from the DOM.\n                Note: MUST be placed on a <template> tag!\n  - x-cloak  -> Hides raw HTML until Alpine finishes initialization.\n  ============================================================\n-->\n\n<div \n  x-data="{ \n    activeTab: \'overview\',\n    showSecretNotice: false,\n    toggleSecret() { this.showSecretNotice = !this.showSecretNotice; }\n  }"\n  class="max-w-lg mx-auto p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 font-sans space-y-6"\n>\n  <!-- Header -->\n  <div class="border-b border-slate-100 dark:border-slate-800 pb-3 flex items-center justify-between">\n    <div>\n      <h2 class="text-xl font-bold text-[#00283c] dark:text-white">Tabs & Conditionals</h2>\n      <p class="text-xs text-slate-500 dark:text-slate-400">Compare x-show vs template x-if</p>\n    </div>\n    <!-- Pill indicator -->\n    <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-semibold">\n      x-cloak active\n    </span>\n  </div>\n\n  <!-- Tab Buttons Switcher -->\n  <div class="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl gap-1">\n    <button \n      @click="activeTab = \'overview\'" \n      :class="activeTab === \'overview\' ? \'bg-white dark:bg-slate-700 text-[#00283c] dark:text-white shadow-xs font-bold\' : \'text-slate-500 dark:text-slate-400 hover:text-slate-800 font-medium\'"\n      class="flex-1 py-2 text-xs rounded-lg transition cursor-pointer"\n    >\n      Overview (x-show)\n    </button>\n    <button \n      @click="activeTab = \'architecture\'" \n      :class="activeTab === \'architecture\' ? \'bg-white dark:bg-slate-700 text-[#00283c] dark:text-white shadow-xs font-bold\' : \'text-slate-500 dark:text-slate-400 hover:text-slate-800 font-medium\'"\n      class="flex-1 py-2 text-xs rounded-lg transition cursor-pointer"\n    >\n      Architecture (x-if)\n    </button>\n  </div>\n\n  <!--\n    [ALPINE DIRECTIVE: x-show]\n    - WHAT: Toggles display: none based on expression.\n    - WHY: Ideal for components frequently toggled (modals, accordions, tabs).\n    - PERFORMANCE: Lightweight; elements stay in DOM so no recreation cost.\n  -->\n  <div x-show="activeTab === \'overview\'" class="space-y-3">\n    <div class="p-4 bg-sky-50 dark:bg-sky-950/40 rounded-xl border border-sky-100 dark:border-sky-900/50 text-xs text-sky-900 dark:text-sky-200">\n      <h4 class="font-bold mb-1">x-show: CSS Display Toggle</h4>\n      <p>This tab is hidden/shown using inline CSS (display: none). Inspect the DOM in devtools: the nodes remain present even when inactive.</p>\n    </div>\n  </div>\n\n  <!--\n    [ALPINE DIRECTIVE: x-if]\n    - WHAT: Completely removes or recreates the DOM subtree.\n    - RULE: MUST be wrapped in a <template> tag.\n    - WHY: Useful when content is heavy or should only mount when activated.\n  -->\n  <template x-if="activeTab === \'architecture\'">\n    <div class="p-4 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-100 dark:border-amber-900/50 text-xs text-amber-900 dark:text-amber-200 space-y-2">\n      <h4 class="font-bold">x-if: Real DOM Insertion</h4>\n      <p>This DOM tree is mounted only when \'activeTab === architecture\'. When you switch away, Alpine cleans up and tears down this HTML node.</p>\n    </div>\n  </template>\n\n  <!-- Toggle Notice with x-cloak demonstration -->\n  <div class="pt-4 border-t border-slate-100 dark:border-slate-800">\n    <button \n      @click="toggleSecret()"\n      class="w-full py-2.5 px-4 rounded-xl bg-[#fa6432]/10 hover:bg-[#fa6432]/20 text-[#fa6432] text-xs font-bold transition flex items-center justify-between cursor-pointer"\n    >\n      <span x-text="showSecretNotice ? \'Hide Student Notice\' : \'Reveal Student Notice\'"></span>\n      <span x-text="showSecretNotice ? \'▲\' : \'▼\'"></span>\n    </button>\n\n    <!--\n      [ALPINE DIRECTIVE: x-cloak]\n      - Prevents FOUC (Flash of Unstyled Content).\n      - Style in index.css: [x-cloak] { display: none !important; }\n    -->\n    <div \n      x-show="showSecretNotice" \n      x-cloak \n      class="mt-3 p-3 bg-slate-50 dark:bg-slate-800/80 rounded-xl text-xs text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700"\n    >\n      Important: Always add [x-cloak] { display: none !important; } to your CSS stylesheet to prevent elements from flashing before JavaScript loads.\n    </div>\n  </div>\n</div>',
   },
   {
     id: 'lesson-04-lists',
@@ -498,739 +48,320 @@ export const DEFAULT_SNIPPETS: Snippet[] = [
     difficulty: 'Beginner',
     tags: ['x-for', 'Arrays', 'Lists', 'Todo'],
     isDefault: true,
-    createdAt: Date.now() - 70000,
-    updatedAt: Date.now() - 70000,
-    code: `<!--
-  ============================================================
-  🎓 LESSON 04: REPEATING LISTS & ARRAYS WITH X-FOR
-  Thomas More Applied Informatics / Tech Lab
-  ------------------------------------------------------------
-  Key Concepts:
-  • x-for: Loops over arrays to render dynamic HTML templates.
-  • :key: Crucial for Alpine to track individual items during
-    additions, deletions, and reordering.
-  • Getters: JavaScript 'get propertyName()' functions act as
-    reactive computed properties in Alpine!
-  ============================================================
--->
-
-<!--
-  [ALPINE DIRECTIVE: x-data with Array & Computed Getters]
-  • 'todos' array stores individual task items.
-  • 'filteredTodos' getter reactively recalculates when 'filter' or 'todos' changes.
-  • 'remainingCount' getter computes how many tasks are pending.
--->
-<div 
-  x-data="{
-    newTodo: '',
-    filter: 'all',
-    todos: [
-      { id: 1, text: 'Review Alpine.js x-data syntax', completed: true },
-      { id: 2, text: 'Build a Thomas More student project', completed: false },
-      { id: 3, text: 'Style with modern Tailwind v4 utilities', completed: false }
-    ],
-    addTodo() {
-      if (!this.newTodo.trim()) return;
-      this.todos.push({
-        id: Date.now(),
-        text: this.newTodo.trim(),
-        completed: false
-      });
-      this.newTodo = '';
-    },
-    removeTodo(id) {
-      this.todos = this.todos.filter(t => t.id !== id);
-    },
-    get filteredTodos() {
-      if (this.filter === 'active') return this.todos.filter(t => !t.completed);
-      if (this.filter === 'completed') return this.todos.filter(t => t.completed);
-      return this.todos;
-    },
-    get remainingCount() {
-      return this.todos.filter(t => !t.completed).length;
-    }
-  }"
-  class="max-w-md mx-auto p-6 bg-white rounded-2xl shadow-xl border border-slate-100 font-sans"
->
-  <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-    <div>
-      <h2 class="text-lg font-bold text-[#00283c]">Alpine Task Board</h2>
-      <p class="text-xs text-slate-500">Managing dynamic collections</p>
-    </div>
-    <!--
-      [ALPINE DIRECTIVE: x-text displaying Computed Getter]
-      • Automatically updates as items are checked or added!
-    -->
-    <span 
-      class="text-xs font-bold px-2.5 py-1 rounded-full bg-[#00283c] text-white"
-      x-text="remainingCount + ' remaining'"
-    ></span>
-  </div>
-
-  <!--
-    [ALPINE DIRECTIVE: @submit.prevent="addTodo()"]
-    • Intercepts form submission and adds the new task to the reactive array.
-  -->
-  <form @submit.prevent="addTodo()" class="mt-4 flex gap-2">
-    <!--
-      [ALPINE DIRECTIVE: x-model="newTodo"]
-      • Two-way binds input field to 'newTodo'.
-    -->
-    <input 
-      type="text" 
-      x-model="newTodo"
-      placeholder="Add a new assignment..."
-      class="flex-1 px-3.5 py-2 text-xs rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#fa6432]"
-    />
-    <button 
-      type="submit"
-      class="px-4 py-2 bg-[#fa6432] hover:bg-[#e25325] text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer"
-    >
-      Add
-    </button>
-  </form>
-
-  <!-- Filter Pills -->
-  <div class="flex gap-2 my-4 text-xs">
-    <!--
-      [ALPINE DIRECTIVES: @click & :class on Filter Buttons]
-      • Sets 'filter' to 'all', 'active', or 'completed'.
-      • Shows reactive counts using x-text.
-    -->
-    <button 
-      @click="filter = 'all'" 
-      :class="filter === 'all' ? 'bg-[#00283c] text-white font-bold' : 'bg-slate-100 text-slate-600'"
-      class="px-2.5 py-1 rounded-lg transition cursor-pointer"
-    >
-      All (<span x-text="todos.length"></span>)
-    </button>
-    <button 
-      @click="filter = 'active'" 
-      :class="filter === 'active' ? 'bg-[#00283c] text-white font-bold' : 'bg-slate-100 text-slate-600'"
-      class="px-2.5 py-1 rounded-lg transition cursor-pointer"
-    >
-      Pending (<span x-text="remainingCount"></span>)
-    </button>
-    <button 
-      @click="filter = 'completed'" 
-      :class="filter === 'completed' ? 'bg-[#00283c] text-white font-bold' : 'bg-slate-100 text-slate-600'"
-      class="px-2.5 py-1 rounded-lg transition cursor-pointer"
-    >
-      Done (<span x-text="todos.length - remainingCount"></span>)
-    </button>
-  </div>
-
-  <!-- Todo List -->
-  <ul class="space-y-2 max-h-60 overflow-y-auto">
-    <!--
-      [ALPINE DIRECTIVE: x-for on <template>]
-      • WHAT: Loops over 'filteredTodos' computed property.
-      • RULE: Must be on <template>.
-      • :key="todo.id": ESSENTIAL! Identifies each list item so Alpine only mutates
-        the exact DOM node that changed instead of rebuilding the entire list.
-    -->
-    <template x-for="todo in filteredTodos" :key="todo.id">
-      <li class="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-slate-100 transition group border border-slate-200/70">
-        <label class="flex items-center gap-2.5 cursor-pointer flex-1">
-          <!--
-            [ALPINE DIRECTIVE: x-model="todo.completed"]
-            • Two-way binds directly into the individual todo object inside the array!
-          -->
-          <input 
-            type="checkbox" 
-            x-model="todo.completed"
-            class="w-4 h-4 rounded accent-[#fa6432]"
-          />
-          <!--
-            [ALPINE DIRECTIVE: :class & x-text]
-            • Strikes through text when todo.completed is true.
-            • x-text renders the task title safely.
-          -->
-          <span 
-            :class="todo.completed ? 'line-through text-slate-400' : 'text-slate-800 font-medium'"
-            class="text-xs transition-colors"
-            x-text="todo.text"
-          ></span>
-        </label>
-        <!--
-          [ALPINE DIRECTIVE: @click="removeTodo(todo.id)"]
-          • Passes the current todo's id to removeTodo() to filter it out of state.
-        -->
-        <button 
-          @click="removeTodo(todo.id)"
-          class="text-slate-400 hover:text-red-500 text-xs px-2 py-1 rounded transition opacity-60 group-hover:opacity-100 cursor-pointer"
-        >
-          ✕
-        </button>
-      </li>
-    </template>
-  </ul>
-</div>`,
+    createdAt: 1726590300000,
+    updatedAt: 1726590300000,
+    code: '<!-- \n  ============================================================\n  LESSON 04: LISTS & DYNAMIC ARRAYS (x-for)\n  Thomas More Applied Informatics / Tech Lab\n  ------------------------------------------------------------\n  Core Directives introduced:\n  - x-for  -> Iterates over arrays or objects.\n  - :key   -> Uniquely identifies array items for DOM reconciliation.\n  - RULE   -> x-for must be declared on a <template> tag.\n  ============================================================\n-->\n\n<div \n  x-data="{\n    newTitle: \'\',\n    newCategory: \'Study\',\n    tasks: [\n      { id: 1, title: \'Clean Code in JavaScript\', category: \'Study\', done: true },\n      { id: 2, title: \'Alpine.js Up and Running\', category: \'Project\', done: false },\n      { id: 3, title: \'Modern Tailwind CSS v4\', category: \'Study\', done: false }\n    ],\n    addTask() {\n      if (!this.newTitle.trim()) return;\n      this.tasks.push({\n        id: Date.now(),\n        title: this.newTitle.trim(),\n        category: this.newCategory,\n        done: false\n      });\n      this.newTitle = \'\';\n    },\n    deleteTask(id) {\n      this.tasks = this.tasks.filter(t => t.id !== id);\n    },\n    get completedCount() {\n      return this.tasks.filter(t => t.done).length;\n    }\n  }"\n  class="max-w-lg mx-auto p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 font-sans space-y-6"\n>\n  <!-- Header with Task Stats -->\n  <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">\n    <div>\n      <h2 class="text-xl font-bold text-[#00283c] dark:text-white">Course Task Manager</h2>\n      <p class="text-xs text-slate-500 dark:text-slate-400">Array mutations & list rendering</p>\n    </div>\n    <div class="text-right">\n      <span class="text-xs font-bold text-[#fa6432]" x-text="completedCount + \'/\' + tasks.length + \' Done\'"></span>\n      <div class="w-24 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full mt-1 overflow-hidden">\n        <div \n          class="h-full bg-[#fa6432] transition-all duration-300"\n          :style="\'width: \' + (tasks.length ? (completedCount / tasks.length * 100) : 0) + \'%\'"\n        ></div>\n      </div>\n    </div>\n  </div>\n\n  <!-- Add Task Input Form -->\n  <form @submit.prevent="addTask()" class="flex gap-2">\n    <input \n      type="text" \n      x-model="newTitle" \n      placeholder="What do you need to study?"\n      class="flex-1 px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:border-[#fa6432] dark:text-white"\n    />\n    <select \n      x-model="newCategory"\n      class="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs dark:text-white"\n    >\n      <option value="Study">Study</option>\n      <option value="Project">Project</option>\n      <option value="Exam">Exam</option>\n    </select>\n    <button \n      type="submit" \n      class="px-4 py-2 bg-[#fa6432] text-white rounded-xl text-xs font-bold hover:bg-[#e25325] transition active:scale-95 cursor-pointer"\n    >\n      Add\n    </button>\n  </form>\n\n  <!--\n    [ALPINE DIRECTIVE: x-for with :key]\n    - Iterates over the \'tasks\' array.\n    - Always provide a unique :key (e.g. task.id) to prevent state bugs.\n  -->\n  <div class="space-y-2">\n    <template x-for="task in tasks" :key="task.id">\n      <div \n        class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/80 dark:border-slate-700 transition"\n        :class="{ \'opacity-60\': task.done }"\n      >\n        <div class="flex items-center gap-3">\n          <input \n            type="checkbox" \n            x-model="task.done"\n            class="rounded text-[#fa6432] focus:ring-[#fa6432] dark:bg-slate-800 cursor-pointer"\n          />\n          <div>\n            <span \n              class="text-xs font-medium text-slate-800 dark:text-slate-200"\n              :class="{ \'line-through text-slate-400 dark:text-slate-500\': task.done }"\n              x-text="task.title"\n            ></span>\n            <span \n              class="ml-2 text-[9px] px-1.5 py-0.5 rounded-full font-semibold"\n              :class="task.category === \'Exam\' ? \'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300\' : \'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300\'"\n              x-text="task.category"\n            ></span>\n          </div>\n        </div>\n\n        <button \n          @click="deleteTask(task.id)"\n          class="text-slate-400 hover:text-rose-500 transition text-xs p-1 cursor-pointer"\n          title="Delete task"\n        >\n          Remove\n        </button>\n      </div>\n    </template>\n\n    <div x-show="tasks.length === 0" class="text-center py-8 text-xs text-slate-400">\n      No tasks scheduled. Add your first goal above!\n    </div>\n  </div>\n</div>',
   },
   {
-    id: 'lesson-05-transitions',
-    title: '05. Transitions & Modals (x-transition)',
+    id: 'lesson-05-attributes-classes',
+    title: '05. Dynamic Attributes & Classes (:class, :disabled, :style)',
+    description:
+      'Master dynamic styling with object syntax, ternary classes, disabled button states, and inline CSS styles.',
+    category: 'Fundamentals',
+    difficulty: 'Beginner',
+    tags: ['x-bind', ':class', ':disabled', ':style', 'Dynamic Styling'],
+    isDefault: true,
+    createdAt: 1726590400000,
+    updatedAt: 1726590400000,
+    code: '<!-- \n  ============================================================\n  LESSON 05: DYNAMIC ATTRIBUTES & CLASSES (:class, :disabled, :style)\n  Thomas More Applied Informatics / Tech Lab\n  ------------------------------------------------------------\n  Core Directives introduced:\n  - :class    -> Dynamic CSS classes via objects, arrays, or ternaries.\n  - :disabled -> Conditionally disables buttons, inputs, or selects.\n  - :style    -> Binds dynamic inline CSS styles using objects or strings.\n  - :src, :href, :title -> Binds any standard HTML attribute.\n  ============================================================\n-->\n\n<div \n  x-data="{\n    themeColor: \'coral\',\n    isOutlined: false,\n    isRounded: true,\n    fontSize: 14,\n    isDisabled: false,\n    borderWidth: 2,\n    colors: [\n      { id: \'coral\', name: \'Thomas More Coral\', hex: \'#fa6432\' },\n      { id: \'navy\', name: \'TM Navy\', hex: \'#00283c\' },\n      { id: \'emerald\', name: \'Forest Emerald\', hex: \'#059669\' },\n      { id: \'violet\', name: \'Deep Violet\', hex: \'#7c3aed\' }\n    ],\n    get activeHex() {\n      return (this.colors.find(c => c.id === this.themeColor) || this.colors[0]).hex;\n    }\n  }"\n  class="max-w-xl mx-auto p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 font-sans space-y-6"\n>\n  <!-- Header -->\n  <div class="border-b border-slate-100 dark:border-slate-800 pb-4">\n    <h2 class="text-xl font-bold text-[#00283c] dark:text-white">Dynamic Attribute Studio</h2>\n    <p class="text-xs text-slate-500 dark:text-slate-400">Interact with :class objects, :disabled, and :style bindings</p>\n  </div>\n\n  <!-- Interactive Controls -->\n  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">\n    <!-- Theme Palette Selector -->\n    <div>\n      <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Theme Palette</label>\n      <div class="flex gap-2">\n        <template x-for="c in colors" :key="c.id">\n          <button \n            @click="themeColor = c.id"\n            class="w-7 h-7 rounded-full border-2 transition active:scale-95 cursor-pointer"\n            :style="\'background-color: \' + c.hex"\n            :class="themeColor === c.id ? \'border-slate-900 dark:border-white ring-2 ring-[#fa6432]/40\' : \'border-transparent\'"\n            :title="c.name"\n          ></button>\n        </template>\n      </div>\n    </div>\n\n    <!-- Font Size Slider -->\n    <div>\n      <div class="flex justify-between font-semibold text-slate-700 dark:text-slate-300 mb-1">\n        <span>Font Size</span>\n        <span x-text="fontSize + \'px\'" class="text-[#fa6432]"></span>\n      </div>\n      <input \n        type="range" \n        min="12" \n        max="22" \n        x-model.number="fontSize" \n        class="w-full accent-[#fa6432]"\n      />\n    </div>\n\n    <!-- Toggle Checkboxes -->\n    <div class="flex gap-4 items-center">\n      <label class="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 cursor-pointer">\n        <input type="checkbox" x-model="isOutlined" class="rounded text-[#fa6432]" />\n        <span>Outline Style</span>\n      </label>\n      <label class="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 cursor-pointer">\n        <input type="checkbox" x-model="isRounded" class="rounded text-[#fa6432]" />\n        <span>Pill Corners</span>\n      </label>\n    </div>\n\n    <!-- Disabled State Switch -->\n    <div class="flex items-center">\n      <label class="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 cursor-pointer">\n        <input type="checkbox" x-model="isDisabled" class="rounded text-rose-500" />\n        <span :class="{ \'font-bold text-rose-500\': isDisabled }">Disable Component</span>\n      </label>\n    </div>\n  </div>\n\n  <!-- Dynamic Target Element Preview -->\n  <div class="p-8 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200/80 dark:border-slate-700 text-center space-y-4">\n    <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">Computed Component Preview</span>\n\n    <!--\n      [ALPINE DIRECTIVE: :class with Object Syntax]\n      - In object syntax: { \'class-name\': booleanCondition }\n      - Only classes whose value evaluates to true will be applied!\n      \n      [ALPINE DIRECTIVE: :style]\n      - Dynamically sets inline styles like color and fontSize.\n    -->\n    <button\n      :disabled="isDisabled"\n      class="px-6 py-3 font-semibold transition-all duration-200 shadow-sm cursor-pointer"\n      :class="{\n        \'rounded-full\': isRounded,\n        \'rounded-lg\': !isRounded,\n        \'border-2\': isOutlined,\n        \'text-white\': !isOutlined && !isDisabled,\n        \'opacity-40 cursor-not-allowed\': isDisabled\n      }"\n      :style="{\n        backgroundColor: isOutlined || isDisabled ? \'transparent\' : activeHex,\n        borderColor: activeHex,\n        color: isOutlined && !isDisabled ? activeHex : (isOutlined && isDisabled ? \'#94a3b8\' : \'white\'),\n        fontSize: fontSize + \'px\'\n      }"\n    >\n      <span x-text="isDisabled ? \'Component Disabled\' : \'Interactive Alpine Button\'"></span>\n    </button>\n  </div>\n</div>',
+  },
+  {
+    id: 'lesson-06-event-modifiers',
+    title: '06. Event Modifiers (.prevent, .stop, .window, .debounce)',
+    description:
+      'Control event handling precision with .prevent, .stop, .window, .debounce, and .throttle modifiers.',
+    category: 'Fundamentals',
+    difficulty: 'Beginner',
+    tags: ['x-on', 'Modifiers', '.prevent', '.debounce', 'Events'],
+    isDefault: true,
+    createdAt: 1726590500000,
+    updatedAt: 1726590500000,
+    code: '<!-- \n  ============================================================\n  LESSON 06: EVENT MODIFIERS (.prevent, .stop, .window, .debounce)\n  Thomas More Applied Informatics / Tech Lab\n  ------------------------------------------------------------\n  Core Event Modifiers introduced:\n  - @submit.prevent -> Calls event.preventDefault() (no page reload).\n  - @click.stop     -> Calls event.stopPropagation() (no bubbling).\n  - @keydown.window -> Listens on global window (e.g., Escape key).\n  - @input.debounce -> Delays execution until typing stops.\n  ============================================================\n-->\n\n<div \n  x-data="{\n    searchQuery: \'\',\n    searchLogs: [],\n    lastEscPressed: null,\n    submitNotice: \'\',\n    outerClicks: 0,\n    innerClicks: 0,\n    handleDebouncedSearch(val) {\n      if (!val.trim()) return;\n      this.searchLogs.unshift({\n        id: Date.now(),\n        query: val,\n        time: new Date().toLocaleTimeString()\n      });\n      if (this.searchLogs.length > 5) this.searchLogs.pop();\n    }\n  }"\n  <!--\n    [ALPINE MODIFIER: @keydown.escape.window]\n    - Listens for the Escape key across the entire browser window!\n  -->\n  @keydown.escape.window="lastEscPressed = new Date().toLocaleTimeString()"\n  class="max-w-lg mx-auto p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 font-sans space-y-6"\n>\n  <!-- Header -->\n  <div class="border-b border-slate-100 dark:border-slate-800 pb-3">\n    <h2 class="text-xl font-bold text-[#00283c] dark:text-white">Event Modifiers Masterclass</h2>\n    <p class="text-xs text-slate-500 dark:text-slate-400">Test .prevent, .stop, .window, and .debounce in real time</p>\n  </div>\n\n  <!-- Modifier 1: .debounce (500ms) -->\n  <div>\n    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">\n      Debounced Input (@input.debounce.500ms)\n    </label>\n    <input \n      type="text" \n      x-model="searchQuery"\n      @input.debounce.500ms="handleDebouncedSearch(searchQuery)"\n      placeholder="Type rapidly... handler runs 500ms after you stop"\n      class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:border-[#fa6432] dark:text-white"\n    />\n    <div class="mt-2 space-y-1">\n      <template x-for="log in searchLogs" :key="log.id">\n        <div class="text-[11px] text-slate-500 dark:text-slate-400 flex justify-between bg-slate-50 dark:bg-slate-800/40 px-2 py-1 rounded">\n          <span>Search executed: <strong class="text-[#fa6432]" x-text="log.query"></strong></span>\n          <span class="font-mono text-[10px]" x-text="log.time"></span>\n        </div>\n      </template>\n    </div>\n  </div>\n\n  <!-- Modifier 2: @click.stop (Stop Event Bubbling) -->\n  <div \n    @click="outerClicks++"\n    class="p-4 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer space-y-2"\n  >\n    <div class="flex justify-between text-xs">\n      <span class="font-bold text-slate-700 dark:text-slate-200">Outer Box (Clicks: <span x-text="outerClicks"></span>)</span>\n      <span class="text-[10px] text-slate-400">Clicking here increments outer</span>\n    </div>\n\n    <!-- Inner Button with .stop -->\n    <button \n      @click.stop="innerClicks++"\n      class="px-3 py-1.5 bg-[#fa6432] text-white rounded-lg text-xs font-semibold hover:bg-[#ff8559] transition cursor-pointer"\n    >\n      Inner Button with .stop (Clicks: <span x-text="innerClicks"></span>)\n    </button>\n  </div>\n\n  <!-- Modifier 3: Global Window Event (@keydown.escape.window) -->\n  <div class="p-3 bg-sky-50 dark:bg-sky-950/40 rounded-xl border border-sky-100 dark:border-sky-900/50 flex items-center justify-between text-xs">\n    <span class="text-sky-900 dark:text-sky-200">Press <kbd class="px-1.5 py-0.5 bg-white dark:bg-slate-800 rounded border font-mono">Esc</kbd> anywhere:</span>\n    <span class="font-mono font-bold text-sky-600 dark:text-sky-400" x-text="lastEscPressed ? \'Captured at \' + lastEscPressed : \'Waiting for Esc...\'"></span>\n  </div>\n</div>',
+  },
+  {
+    id: 'lesson-07-html-text-rendering',
+    title: '07. HTML Content & Safe Rendering (x-html vs x-text)',
+    description:
+      'Compare plain text rendering with x-text and raw rich HTML insertion with x-html, including safety practices.',
+    category: 'Fundamentals',
+    difficulty: 'Beginner',
+    tags: ['x-html', 'x-text', 'Sanitization', 'Formatting'],
+    isDefault: true,
+    createdAt: 1726590600000,
+    updatedAt: 1726590600000,
+    code: '<!-- \n  ============================================================\n  LESSON 07: HTML CONTENT & SAFE RENDERING (x-html vs x-text)\n  Thomas More Applied Informatics / Tech Lab\n  ------------------------------------------------------------\n  Core Directives introduced:\n  - x-text -> Safely sets textContent (XSS immune).\n  - x-html -> Sets innerHTML (renders markup, bold, links, spans).\n  - SECURITY: Never pass untrusted user input directly to x-html!\n  ============================================================\n-->\n\n<div \n  x-data="{\n    rawSnippet: \'<strong>Notice:</strong> Welcome to the <em>Alpine.js Lab</em>. Use <code class=\\\'bg-amber-100 dark:bg-amber-900 text-[#fa6432] px-1 rounded\\\'>x-html</code> for rich markup.\',\n    presetSamples: [\n      { label: \'Badge\', html: \'<span class=\\\'px-2 py-0.5 bg-emerald-500 text-white text-xs font-bold rounded-full\\\'>Approved</span>\' },\n      { label: \'Link\', html: \'<a href=\\\'#\\\' class=\\\'text-[#fa6432] font-semibold underline\\\'>Visit Documentation</a>\' },\n      { label: \'Alert\', html: \'<span class=\\\'text-rose-500 font-bold\\\'>Critical Warning:</span> System reboot in 5 min.\' }\n    ]\n  }"\n  class="max-w-lg mx-auto p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 font-sans space-y-6"\n>\n  <!-- Header -->\n  <div class="border-b border-slate-100 dark:border-slate-800 pb-3">\n    <h2 class="text-xl font-bold text-[#00283c] dark:text-white">x-text vs x-html Comparison</h2>\n    <p class="text-xs text-slate-500 dark:text-slate-400">Understand text escaping versus formatted HTML rendering</p>\n  </div>\n\n  <!-- Raw Input Field -->\n  <div>\n    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">HTML Markup String</label>\n    <textarea \n      x-model="rawSnippet"\n      rows="3"\n      class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-mono focus:outline-none focus:border-[#fa6432] dark:text-white"\n    ></textarea>\n    \n    <!-- Quick Presets -->\n    <div class="flex gap-2 mt-2">\n      <template x-for="sample in presetSamples" :key="sample.label">\n        <button \n          @click="rawSnippet = sample.html"\n          class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-semibold rounded-md transition cursor-pointer"\n          x-text="\'Insert \' + sample.label"\n        ></button>\n      </template>\n    </div>\n  </div>\n\n  <!-- Output 1: Safe x-text -->\n  <div class="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">\n    <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1">Rendered with x-text (Safe Plain Text)</span>\n    <div x-text="rawSnippet" class="text-xs font-mono text-slate-700 dark:text-slate-300 break-words"></div>\n  </div>\n\n  <!-- Output 2: Formatted x-html -->\n  <div class="p-4 bg-amber-50/50 dark:bg-amber-950/30 rounded-xl border border-amber-200 dark:border-amber-900/50">\n    <span class="text-[10px] uppercase font-bold tracking-wider text-amber-700 dark:text-amber-400 block mb-1">Rendered with x-html (Formatted Markup)</span>\n    <div x-html="rawSnippet" class="text-xs text-slate-800 dark:text-slate-200"></div>\n  </div>\n</div>',
+  },
+  {
+    id: 'lesson-08-dom-refs',
+    title: '08. Element References & DOM Access ($refs, $el)',
+    description:
+      'Access native DOM nodes using x-ref, trigger input focus, and inspect element dimensions with $el.',
+    category: 'Fundamentals',
+    difficulty: 'Beginner',
+    tags: ['$refs', '$el', 'DOM', 'Focus Management'],
+    isDefault: true,
+    createdAt: 1726590700000,
+    updatedAt: 1726590700000,
+    code: '<!-- \n  ============================================================\n  LESSON 08: DOM REFERENCES & ELEMENTS ($refs, $el)\n  Thomas More Applied Informatics / Tech Lab\n  ------------------------------------------------------------\n  Core Directives introduced:\n  - x-ref -> Names a DOM element inside the component.\n  - $refs -> Accesses the named DOM node directly in JavaScript.\n  - $el   -> Returns the current component root DOM element.\n  ============================================================\n-->\n\n<div \n  x-data="{\n    message: \'\',\n    boxWidth: 0,\n    boxHeight: 0,\n    focusInput() {\n      // Access the DOM element with x-ref=\'textInput\' and call .focus()\n      this.$refs.textInput.focus();\n    },\n    measureBox() {\n      this.boxWidth = this.$refs.measureTarget.offsetWidth;\n      this.boxHeight = this.$refs.measureTarget.offsetHeight;\n    },\n    copyToClipboard() {\n      this.$refs.textInput.select();\n      navigator.clipboard.writeText(this.message);\n    }\n  }"\n  x-init="measureBox()"\n  class="max-w-lg mx-auto p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 font-sans space-y-6"\n>\n  <!-- Header -->\n  <div class="border-b border-slate-100 dark:border-slate-800 pb-3">\n    <h2 class="text-xl font-bold text-[#00283c] dark:text-white">DOM Control with $refs & $el</h2>\n    <p class="text-xs text-slate-500 dark:text-slate-400">Direct element access without document.querySelector</p>\n  </div>\n\n  <!-- Focusable Input with x-ref -->\n  <div>\n    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Target Input (x-ref=\'textInput\')</label>\n    <div class="flex gap-2">\n      <!--\n        [ALPINE DIRECTIVE: x-ref]\n        - Labels this element so it can be referenced anywhere via $refs.textInput\n      -->\n      <input \n        x-ref="textInput"\n        type="text" \n        x-model="message"\n        placeholder="Click Focus button to jump here..." \n        class="flex-1 px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:border-[#fa6432] focus:ring-2 focus:ring-[#fa6432]/20 dark:text-white"\n      />\n      <button \n        @click="focusInput()"\n        class="px-3 py-2 bg-[#fa6432] text-white font-semibold rounded-xl text-xs hover:bg-[#ff8559] transition cursor-pointer"\n      >\n        Focus Input\n      </button>\n      <button \n        @click="copyToClipboard()"\n        class="px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold rounded-xl text-xs transition cursor-pointer"\n      >\n        Copy\n      </button>\n    </div>\n  </div>\n\n  <!-- Dynamic Dimension Measurement -->\n  <div>\n    <span class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Measured Box ($refs.measureTarget)</span>\n    <div \n      x-ref="measureTarget"\n      class="p-4 bg-gradient-to-r from-[#00283c] to-[#0b384f] text-white rounded-xl flex items-center justify-between"\n    >\n      <div>\n        <p class="text-xs font-bold">Resizing Target Container</p>\n        <p class="text-[11px] text-slate-300">Measured via native offsetWidth & offsetHeight</p>\n      </div>\n      <div class="text-right font-mono text-xs text-[#fa6432] font-bold">\n        <span x-text="boxWidth + \'px\'"></span> &times; <span x-text="boxHeight + \'px\'"></span>\n      </div>\n    </div>\n  </div>\n</div>',
+  },
+  {
+    id: 'lesson-09-transitions',
+    title: '09. Transitions & Animations (x-transition)',
     description:
       'Create smooth animations, accessible backdrop blur modals, and click-outside dismissal.',
     category: 'Components',
     difficulty: 'Intermediate',
     tags: ['x-transition', 'Modal', 'Animations', 'Events'],
     isDefault: true,
-    createdAt: Date.now() - 60000,
-    updatedAt: Date.now() - 60000,
-    code: `<!--
-  ============================================================
-  🎓 LESSON 05: TRANSITIONS & MODALS IN ALPINE.JS
-  Thomas More Applied Informatics / Tech Lab
-  ------------------------------------------------------------
-  Key Directives & Modifiers:
-  • x-transition: Automatically coordinates CSS transition stages:
-    enter, enter-start, enter-end, leave, leave-start, leave-end.
-  • @click.outside: Fires when user clicks anywhere OUTSIDE the element.
-  • @keydown.escape.window: Listens on the global window object for Escape.
-  ============================================================
--->
-
-<!--
-  [ALPINE DIRECTIVE: x-data & Window Event Listener]
-  • 'isOpen' controls whether the modal dialog is open or closed.
-  • @keydown.escape.window="isOpen = false":
-    The '.window' modifier attaches the listener to window instead of just this div,
-    enabling global accessibility: press ESC anywhere to dismiss!
--->
-<div 
-  x-data="{ isOpen: false }"
-  @keydown.escape.window="isOpen = false"
-  class="max-w-md mx-auto p-8 text-center bg-white rounded-2xl shadow-lg border border-slate-100 font-sans"
->
-  <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[#fa6432]/10 text-[#fa6432] flex items-center justify-center text-2xl font-bold">
-    ⚡
-  </div>
-
-  <h2 class="text-xl font-bold text-[#00283c]">Alpine Transition Workshop</h2>
-  <p class="text-xs text-slate-500 mt-1 max-w-xs mx-auto">
-    Discover how effortless smooth transitions and accessibility can be with Alpine.js!
-  </p>
-
-  <!--
-    [ALPINE DIRECTIVE: @click="isOpen = true"]
-    • Sets isOpen to true, triggering the x-show and transitions below.
-  -->
-  <button 
-    @click="isOpen = true"
-    class="mt-6 px-5 py-2.5 rounded-xl bg-[#00283c] hover:bg-[#0b384f] text-white text-xs font-bold transition shadow-md cursor-pointer active:scale-95"
-  >
-    Open Course Information Modal
-  </button>
-
-  <!--
-    [ALPINE DIRECTIVE: Modal Backdrop with Granular x-transition]
-    • x-show="isOpen": Controls backdrop visibility.
-    • x-transition:enter / enter-start / enter-end: Defines fade-in animation using Tailwind classes.
-    • x-transition:leave / leave-start / leave-end: Defines fade-out animation when closing.
-  -->
-  <div 
-    x-show="isOpen"
-    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00283c]/60 backdrop-blur-xs"
-    x-transition:enter="transition ease-out duration-300"
-    x-transition:enter-start="opacity-0"
-    x-transition:enter-end="opacity-100"
-    x-transition:leave="transition ease-in duration-200"
-    x-transition:leave-start="opacity-100"
-    x-transition:leave-end="opacity-0"
-    style="display: none;"
-  >
-    <!--
-      [ALPINE DIRECTIVE: Modal Card with @click.outside & Scale Animation]
-      • @click.outside="isOpen = false": Closes the modal if user clicks on the backdrop!
-      • x-transition:enter-start="opacity-0 scale-95 translate-y-4": Creates a smooth pop-in zoom effect.
-      • x-transition:enter-end="opacity-100 scale-100 translate-y-0": Renders fully visible.
-    -->
-    <div 
-      @click.outside="isOpen = false"
-      x-show="isOpen"
-      x-transition:enter="transition ease-out duration-300 transform"
-      x-transition:enter-start="opacity-0 scale-95 translate-y-4"
-      x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-      x-transition:leave="transition ease-in duration-200 transform"
-      x-transition:leave-start="opacity-100 scale-100 translate-y-0"
-      x-transition:leave-end="opacity-0 scale-95 translate-y-4"
-      class="w-full max-w-sm bg-white rounded-2xl p-6 text-left shadow-2xl border border-slate-200 relative"
-    >
-      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-        <span class="text-xs font-bold text-[#fa6432] uppercase">Thomas More Notice</span>
-        <!--
-          [ALPINE DIRECTIVE: @click="isOpen = false"]
-          • Close button dismisses dialog immediately.
-        -->
-        <button @click="isOpen = false" class="text-slate-400 hover:text-slate-700 cursor-pointer">✕</button>
-      </div>
-
-      <div class="mt-4 space-y-2 text-xs text-slate-600">
-        <p class="font-semibold text-slate-800 text-sm">Exam Registration Open</p>
-        <p>Students can now register their Alpine.js + Tailwind v4 project prototypes via the student portal.</p>
-        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-[11px] text-slate-500">
-          💡 Keyboard tip: Press <kbd class="px-1.5 py-0.5 rounded bg-white border border-slate-300 font-mono text-slate-700">ESC</kbd> to close this dialog anytime.
-        </div>
-      </div>
-
-      <div class="mt-6 flex justify-end gap-2">
-        <button 
-          @click="isOpen = false" 
-          class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer"
-        >
-          Dismiss
-        </button>
-        <button 
-          @click="isOpen = false" 
-          class="px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-[#fa6432] hover:bg-[#e25325] cursor-pointer"
-        >
-          Confirm
-        </button>
-      </div>
-    </div>
-  </div>
-</div>`,
+    createdAt: 1726590800000,
+    updatedAt: 1726590800000,
+    code: '<!-- \n  ============================================================\n  LESSON 09: TRANSITIONS & MODALS (x-transition)\n  Thomas More Applied Informatics / Tech Lab\n  ------------------------------------------------------------\n  Core Directives introduced:\n  - x-transition -> Smooth CSS transitions for elements entering/leaving.\n  - @click.outside -> Listens for clicks outside of an element.\n  - @keydown.escape.window -> Closes overlays when Escape is pressed.\n  ============================================================\n-->\n\n<div \n  x-data="{ \n    isOpen: false,\n    selectedPlan: \'Starter\',\n    openModal(plan) { \n      this.selectedPlan = plan; \n      this.isOpen = true; \n    },\n    closeModal() { \n      this.isOpen = false; \n    }\n  }"\n  @keydown.escape.window="closeModal()"\n  class="max-w-lg mx-auto p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 font-sans space-y-6"\n>\n  <!-- Header -->\n  <div class="border-b border-slate-100 dark:border-slate-800 pb-3">\n    <h2 class="text-xl font-bold text-[#00283c] dark:text-white">Modal & Transition Demo</h2>\n    <p class="text-xs text-slate-500 dark:text-slate-400">Click a plan to trigger an animated dialog with backdrop blur</p>\n  </div>\n\n  <!-- Plans Selection Grid -->\n  <div class="grid grid-cols-2 gap-3">\n    <button \n      @click="openModal(\'Starter - Academic\')"\n      class="p-4 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/80 border border-slate-200/80 dark:border-slate-700 rounded-xl text-left transition cursor-pointer group"\n    >\n      <span class="text-xs font-bold text-[#00283c] dark:text-white block">Starter Academic</span>\n      <span class="text-[11px] text-slate-400 block mt-0.5">Free for TM Students</span>\n      <span class="mt-3 inline-block text-xs font-semibold text-[#fa6432] group-hover:translate-x-0.5 transition-transform">Configure Plan &rarr;</span>\n    </button>\n\n    <button \n      @click="openModal(\'Pro - Research Lab\')"\n      class="p-4 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/80 border border-slate-200/80 dark:border-slate-700 rounded-xl text-left transition cursor-pointer group"\n    >\n      <span class="text-xs font-bold text-[#00283c] dark:text-white block">Pro Research Lab</span>\n      <span class="text-[11px] text-slate-400 block mt-0.5">Unlimited Sandboxes</span>\n      <span class="mt-3 inline-block text-xs font-semibold text-[#fa6432] group-hover:translate-x-0.5 transition-transform">Configure Plan &rarr;</span>\n    </button>\n  </div>\n\n  <!--\n    [ALPINE MODAL WITH TRANSITIONS]\n    - Backdrop: Fades opacity in (200ms) and out (150ms).\n    - Card: Scales from 95% to 100% with smooth opacity easing.\n  -->\n  <div \n    x-show="isOpen"\n    x-cloak\n    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"\n    x-transition:enter="transition ease-out duration-200"\n    x-transition:enter-start="opacity-0"\n    x-transition:enter-end="opacity-100"\n    x-transition:leave="transition ease-in duration-150"\n    x-transition:leave-start="opacity-100"\n    x-transition:leave-end="opacity-0"\n  >\n    <div \n      @click.outside="closeModal()"\n      x-show="isOpen"\n      x-transition:enter="transition ease-out duration-200"\n      x-transition:enter-start="opacity-0 scale-95"\n      x-transition:enter-end="opacity-100 scale-100"\n      x-transition:leave="transition ease-in duration-150"\n      x-transition:leave-start="opacity-100 scale-100"\n      x-transition:leave-end="opacity-0 scale-95"\n      class="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-2xl space-y-4"\n    >\n      <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">\n        <h3 class="text-base font-bold text-[#00283c] dark:text-white">Plan Configuration</h3>\n        <button @click="closeModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white text-sm cursor-pointer">&times;</button>\n      </div>\n\n      <p class="text-xs text-slate-600 dark:text-slate-300">\n        You are configuring: <strong class="text-[#fa6432]" x-text="selectedPlan"></strong>\n      </p>\n\n      <div class="flex justify-end gap-2 pt-2">\n        <button \n          @click="closeModal()"\n          class="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer"\n        >\n          Cancel\n        </button>\n        <button \n          @click="closeModal()"\n          class="px-4 py-2 bg-[#fa6432] text-white text-xs font-bold rounded-xl hover:bg-[#e25325] transition shadow-md shadow-[#fa6432]/20 cursor-pointer"\n        >\n          Confirm Activation\n        </button>\n      </div>\n    </div>\n  </div>\n</div>',
   },
   {
-    id: 'lesson-06-events-refs',
-    title: '06. Events & Refs ($dispatch, $refs)',
+    id: 'lesson-10-dropdown-menu',
+    title: '10. Interactive Dropdown Menu (@click.outside)',
     description:
-      'Dispatch custom bubble events across components and control DOM elements with $refs.',
+      'Build an accessible dropdown navigation menu with keyboard navigation and outside dismissal.',
     category: 'Components',
     difficulty: 'Intermediate',
-    tags: ['$dispatch', '$refs', 'Custom Events'],
+    tags: ['Dropdown', '@click.outside', 'Navigation', 'Menu'],
     isDefault: true,
-    createdAt: Date.now() - 50000,
-    updatedAt: Date.now() - 50000,
-    code: `<!--
-  ============================================================
-  🎓 LESSON 06: EVENTS & REFS ($dispatch, $refs)
-  Thomas More Applied Informatics / Tech Lab
-  ------------------------------------------------------------
-  Magic Properties explained:
-  • $dispatch('name', detail): Dispatches a standard browser CustomEvent
-    that bubbles up the DOM tree, allowing sibling or parent components
-    to communicate cleanly.
-  • $refs: Provides direct references to DOM elements marked with x-ref,
-    without needing document.getElementById or querySelector.
-  ============================================================
--->
-
-<!--
-  [ALPINE DIRECTIVE: x-data with Custom Event Listener]
-  • Maintains a reactive 'notifications' list.
-  • @student-alert.window: Listens for the custom 'student-alert' event
-    fired anywhere in the browser window!
-  • $event.detail: Contains the payload passed into $dispatch.
--->
-<div 
-  x-data="{ 
-    notifications: [],
-    addToast(msg, type = 'info') {
-      const id = Date.now();
-      this.notifications.push({ id, msg, type });
-      setTimeout(() => {
-        this.notifications = this.notifications.filter(n => n.id !== id);
-      }, 3500);
-    }
-  }"
-  @student-alert.window="addToast($event.detail.text, $event.detail.type)"
-  class="max-w-md mx-auto p-6 bg-white rounded-2xl shadow-xl border border-slate-100 font-sans relative"
->
-  <h2 class="text-lg font-bold text-[#00283c]">Event Dispatcher & $refs</h2>
-  <p class="text-xs text-slate-500">Cross-component communication and direct DOM control</p>
-
-  <!--
-    [ALPINE DIRECTIVE: x-ref on Input Field]
-    • x-ref="searchField" tags this element in the component's $refs object.
-    • This allows Alpine to directly call native browser methods like .focus() or .select().
-  -->
-  <div x-data="{ query: '' }" class="mt-5 p-4 bg-slate-50 rounded-xl border border-slate-200">
-    <label class="block text-xs font-semibold text-slate-700 mb-1.5">Direct Focus with $refs</label>
-    <div class="flex gap-2">
-      <input 
-        x-ref="searchField"
-        x-model="query"
-        type="text" 
-        placeholder="Type a student query..."
-        class="flex-1 px-3 py-2 text-xs rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#00283c]"
-      />
-      <!--
-        [ALPINE MAGIC PROPERTY: $refs]
-        • $refs.searchField.focus() triggers input focus immediately on click.
-      -->
-      <button 
-        @click="$refs.searchField.focus(); $refs.searchField.select();"
-        class="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-semibold rounded-lg transition cursor-pointer"
-      >
-        Focus
-      </button>
-    </div>
-  </div>
-
-  <!-- Dispatcher Buttons -->
-  <div class="mt-5 space-y-2">
-    <span class="text-xs font-semibold text-slate-700">Emit Custom Events:</span>
-    <div class="grid grid-cols-2 gap-2">
-      <!--
-        [ALPINE MAGIC PROPERTY: $dispatch]
-        • WHAT: Dispatches a CustomEvent named 'student-alert' with a data payload.
-        • HOW: The parent listener @student-alert.window catches it and displays the toast!
-      -->
-      <button 
-        @click="$dispatch('student-alert', { text: 'Lab submission verified on GitHub!', type: 'success' })"
-        class="p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition cursor-pointer text-center"
-      >
-        Send Success Toast
-      </button>
-      <button 
-        @click="$dispatch('student-alert', { text: 'Reminder: Deadline tomorrow at 23:59', type: 'warning' })"
-        class="p-2.5 bg-[#fa6432] hover:bg-[#e25325] text-white rounded-xl text-xs font-bold transition cursor-pointer text-center"
-      >
-        Send Alert Toast
-      </button>
-    </div>
-  </div>
-
-  <!-- Notification Stack -->
-  <div class="mt-6 space-y-2">
-    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Live Toast Feed:</span>
-    <!--
-      [ALPINE DIRECTIVE: x-for with x-transition & :class]
-      • Automatically animates toasts in and out when added or removed.
-      • :class dynamically styles each toast as green (success) or orange (warning).
-    -->
-    <template x-for="note in notifications" :key="note.id">
-      <div 
-        x-transition
-        :class="note.type === 'success' ? 'bg-emerald-50 border-emerald-300 text-emerald-900' : 'bg-orange-50 border-orange-300 text-orange-900'"
-        class="p-3 rounded-xl border text-xs font-medium flex items-center justify-between shadow-xs"
-      >
-        <span x-text="note.msg"></span>
-        <span class="text-[10px] opacity-70">Just now</span>
-      </div>
-    </template>
-    <!--
-      [ALPINE DIRECTIVE: x-show for Empty State]
-      • Appears whenever no active toasts are present.
-    -->
-    <div x-show="notifications.length === 0" class="text-xs text-slate-400 italic py-2 text-center">
-      No notifications right now. Click a button above!
-    </div>
-  </div>
-</div>`,
+    createdAt: 1726590900000,
+    updatedAt: 1726590900000,
+    code: '<!-- \n  ============================================================\n  LESSON 10: INTERACTIVE DROPDOWN MENU (@click.outside)\n  Thomas More Applied Informatics / Tech Lab\n  ------------------------------------------------------------\n  Core Directives introduced:\n  - @click.outside -> Automatically closes popup when clicking anywhere else.\n  - x-transition   -> Smooth dropdown menu slide and fade.\n  - @keydown.escape.stop -> Closes menu cleanly on Escape.\n  ============================================================\n-->\n\n<div \n  x-data="{\n    open: false,\n    selectedItem: \'Account Settings\',\n    items: [\n      { id: \'profile\', label: \'User Profile\', icon: \'User\' },\n      { id: \'settings\', label: \'Account Settings\', icon: \'Settings\' },\n      { id: \'billing\', label: \'Student Invoices\', icon: \'FileText\' },\n      { id: \'logout\', label: \'Sign Out\', icon: \'LogOut\', danger: true }\n    ],\n    select(item) {\n      this.selectedItem = item.label;\n      this.open = false;\n    }\n  }"\n  class="max-w-md mx-auto p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 font-sans space-y-6"\n>\n  <!-- Header -->\n  <div class="border-b border-slate-100 dark:border-slate-800 pb-3">\n    <h2 class="text-xl font-bold text-[#00283c] dark:text-white">Accessible Dropdown Menu</h2>\n    <p class="text-xs text-slate-500 dark:text-slate-400">Click-outside handling, active state, and animations</p>\n  </div>\n\n  <!-- Dropdown Trigger Container -->\n  <div class="relative inline-block text-left w-full" @click.outside="open = false">\n    <button \n      @click="open = !open" \n      class="w-full flex items-center justify-between px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-800 dark:text-slate-200 hover:border-[#fa6432] transition cursor-pointer"\n    >\n      <span x-text="\'Active: \' + selectedItem"></span>\n      <span class="transition-transform duration-200 text-[#fa6432]" :class="{ \'rotate-180\': open }">&#9662;</span>\n    </button>\n\n    <!-- Menu Panel -->\n    <div \n      x-show="open" \n      x-cloak\n      x-transition:enter="transition ease-out duration-150"\n      x-transition:enter-start="opacity-0 scale-95 -translate-y-2"\n      x-transition:enter-end="opacity-100 scale-100 translate-y-0"\n      x-transition:leave="transition ease-in duration-100"\n      x-transition:leave-start="opacity-100 scale-100 translate-y-0"\n      x-transition:leave-end="opacity-0 scale-95 -translate-y-2"\n      class="absolute left-0 right-0 mt-2 z-20 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl overflow-hidden py-1 text-xs"\n    >\n      <template x-for="item in items" :key="item.id">\n        <button \n          @click="select(item)"\n          class="w-full text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between transition cursor-pointer"\n          :class="{ \'text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30\': item.danger, \'font-bold text-[#fa6432]\': selectedItem === item.label }"\n        >\n          <span x-text="item.label"></span>\n          <span x-show="selectedItem === item.label" class="text-[#fa6432]">&#10003;</span>\n        </button>\n      </template>\n    </div>\n  </div>\n\n  <div class="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-slate-500 dark:text-slate-400">\n    Current Selection: <strong class="text-slate-800 dark:text-white" x-text="selectedItem"></strong>\n  </div>\n</div>',
   },
   {
-    id: 'lesson-07-store',
-    title: '07. Global Store (Alpine.store)',
-    description: 'Manage shared global state across different components without prop drilling.',
+    id: 'lesson-11-tabbed-interface',
+    title: '11. Tabbed Navigation & Dynamic Panels',
+    description:
+      'Multi-tab switcher with animated indicator, keyboard navigation, and panel visibility.',
+    category: 'Components',
+    difficulty: 'Intermediate',
+    tags: ['Tabs', 'Navigation', 'Panels', 'Components'],
+    isDefault: true,
+    createdAt: 1726591000000,
+    updatedAt: 1726591000000,
+    code: '<!-- \n  ============================================================\n  LESSON 11: TABBED NAVIGATION & PANELS\n  Thomas More Applied Informatics / Tech Lab\n  ------------------------------------------------------------\n  Core Directives introduced:\n  - Dynamic panel toggles using state matching.\n  - Animated slider indicator positioned under active tab.\n  - Reusable tab schema rendering with x-for.\n  ============================================================\n-->\n\n<div \n  x-data="{\n    activeTab: \'features\',\n    tabs: [\n      { id: \'features\', label: \'Key Features\' },\n      { id: \'pricing\', label: \'Curriculum\' },\n      { id: \'reviews\', label: \'Student Reviews\' }\n    ]\n  }"\n  class="max-w-lg mx-auto p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 font-sans space-y-6"\n>\n  <!-- Header -->\n  <div class="border-b border-slate-100 dark:border-slate-800 pb-3">\n    <h2 class="text-xl font-bold text-[#00283c] dark:text-white">Tabbed Interface Component</h2>\n    <p class="text-xs text-slate-500 dark:text-slate-400">Declarative tab management with smooth transitions</p>\n  </div>\n\n  <!-- Navigation Bar -->\n  <div class="flex border-b border-slate-200 dark:border-slate-700 gap-6">\n    <template x-for="tab in tabs" :key="tab.id">\n      <button \n        @click="activeTab = tab.id"\n        class="pb-2.5 text-xs font-semibold relative transition cursor-pointer"\n        :class="activeTab === tab.id ? \'text-[#fa6432]\' : \'text-slate-500 hover:text-slate-800 dark:hover:text-slate-300\'"\n      >\n        <span x-text="tab.label"></span>\n        <div \n          x-show="activeTab === tab.id"\n          class="absolute bottom-0 left-0 right-0 h-0.5 bg-[#fa6432] rounded-full"\n        ></div>\n      </button>\n    </template>\n  </div>\n\n  <!-- Tab Panels -->\n  <div>\n    <div x-show="activeTab === \'features\'" class="space-y-2 text-xs text-slate-600 dark:text-slate-300">\n      <h4 class="font-bold text-slate-900 dark:text-white">Declarative Reactivity</h4>\n      <p>Alpine offers the reactive and declarative power of big frameworks like Vue or React at a fraction of the cost, directly in your HTML markup.</p>\n    </div>\n\n    <div x-show="activeTab === \'pricing\'" class="space-y-2 text-xs text-slate-600 dark:text-slate-300">\n      <h4 class="font-bold text-slate-900 dark:text-white">Academic Curriculum</h4>\n      <p>Master 28 interactive coding lessons starting from basic reactivity to full project architectures and plugin integrations.</p>\n    </div>\n\n    <div x-show="activeTab === \'reviews\'" class="space-y-2 text-xs text-slate-600 dark:text-slate-300">\n      <h4 class="font-bold text-slate-900 dark:text-white">Student Feedback</h4>\n      <p>5/5 stars: The live interactive playground makes learning Alpine.js directives fun, visual, and fast!</p>\n    </div>\n  </div>\n</div>',
+  },
+  {
+    id: 'lesson-12-accordions',
+    title: '12. Accordions & Collapsible FAQ (x-collapse)',
+    description:
+      'Smooth height collapse animation using official @alpinejs/collapse plugin, single and multi-open mode.',
+    category: 'Components',
+    difficulty: 'Intermediate',
+    tags: ['x-collapse', 'Accordion', 'FAQ', 'Plugins'],
+    isDefault: true,
+    createdAt: 1726591100000,
+    updatedAt: 1726591100000,
+    code: '<!-- \n  ============================================================\n  LESSON 12: ACCORDIONS & COLLAPSIBLE FAQ (x-collapse)\n  Thomas More Applied Informatics / Tech Lab\n  ------------------------------------------------------------\n  Core Directives introduced:\n  - x-collapse -> Official plugin for buttery-smooth height transitions.\n  - Exclusive accordion logic (closing previous item when opening new).\n  ============================================================\n-->\n\n<div \n  x-data="{\n    activeId: 1,\n    exclusive: true,\n    faqs: [\n      { id: 1, q: \'Why use Alpine.js with Tailwind CSS v4?\', a: \'Alpine provides clean lightweight reactivity directly in HTML, perfectly complementing utility classes without heavyweight virtual DOMs.\' },\n      { id: 2, q: \'How does x-collapse calculate element height?\', a: \'The @alpinejs/collapse plugin dynamically reads scrollHeight and animates height smoothly from 0px to the exact auto dimension.\' },\n      { id: 3, q: \'Can I use official Alpine plugins in this lab?\', a: \'Yes! Collapse, Persist, Focus, Intersect, and Mask are pre-loaded in the sandbox runtime.\' }\n    ],\n    toggle(id) {\n      if (this.exclusive) {\n        this.activeId = (this.activeId === id) ? null : id;\n      }\n    }\n  }"\n  class="max-w-lg mx-auto p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 font-sans space-y-6"\n>\n  <!-- Header -->\n  <div class="border-b border-slate-100 dark:border-slate-800 pb-3 flex items-center justify-between">\n    <div>\n      <h2 class="text-xl font-bold text-[#00283c] dark:text-white">Smooth Collapsible FAQ</h2>\n      <p class="text-xs text-slate-500 dark:text-slate-400">Powered by @alpinejs/collapse plugin</p>\n    </div>\n    <label class="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 cursor-pointer">\n      <input type="checkbox" x-model="exclusive" class="rounded text-[#fa6432]" />\n      <span>One open at a time</span>\n    </label>\n  </div>\n\n  <!-- Accordion List -->\n  <div class="space-y-3">\n    <template x-for="item in faqs" :key="item.id">\n      <div class="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-800/40">\n        <button \n          @click="toggle(item.id)"\n          class="w-full px-4 py-3 text-left text-xs font-bold text-slate-800 dark:text-white flex items-center justify-between hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"\n        >\n          <span x-text="item.q"></span>\n          <span class="text-[#fa6432] transition-transform duration-200" :class="{ \'rotate-180\': activeId === item.id }">&#9662;</span>\n        </button>\n\n        <!--\n          [ALPINE PLUGIN DIRECTIVE: x-collapse]\n          - Replaces CSS max-height hacks with real pixel height animation.\n        -->\n        <div x-show="activeId === item.id" x-collapse>\n          <div class="px-4 pb-3 pt-1 text-xs text-slate-600 dark:text-slate-300 border-t border-slate-100 dark:border-slate-700/60" x-text="item.a"></div>\n        </div>\n      </div>\n    </template>\n  </div>\n</div>',
+  },
+  {
+    id: 'lesson-13-component-communication',
+    title: '13. Component Communication ($dispatch, Custom Events)',
+    description:
+      'Dispatch custom bubble events across decoupled components and listen with @event.window.',
+    category: 'Components',
+    difficulty: 'Intermediate',
+    tags: ['$dispatch', 'Custom Events', 'Architecture', 'Communication'],
+    isDefault: true,
+    createdAt: 1726591200000,
+    updatedAt: 1726591200000,
+    code: '<!-- \n  ============================================================\n  LESSON 13: COMPONENT COMMUNICATION ($dispatch, CUSTOM EVENTS)\n  Thomas More Applied Informatics / Tech Lab\n  ------------------------------------------------------------\n  Core Directives introduced:\n  - $dispatch -> Emits custom browser events with optional payload data.\n  - @custom-event.window -> Listens for emitted events globally across scopes.\n  ============================================================\n-->\n\n<div class="max-w-lg mx-auto p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 font-sans space-y-6">\n  <!-- Header -->\n  <div class="border-b border-slate-100 dark:border-slate-800 pb-3">\n    <h2 class="text-xl font-bold text-[#00283c] dark:text-white">Decoupled Component Messaging</h2>\n    <p class="text-xs text-slate-500 dark:text-slate-400">Communicate across components without prop drilling</p>\n  </div>\n\n  <!-- Component A: Event Sender -->\n  <div \n    x-data="{\n      product: \'Alpine Pro License\',\n      price: 49,\n      sendToCart() {\n        // Dispatches global custom event \'item-added\' with detail payload\n        this.$dispatch(\'item-added\', { product: this.product, price: this.price, time: new Date().toLocaleTimeString() });\n      }\n    }"\n    class="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3"\n  >\n    <div class="flex justify-between items-center text-xs">\n      <span class="font-bold text-slate-800 dark:text-white" x-text="product"></span>\n      <span class="font-bold text-[#fa6432]" x-text="\'$\' + price"></span>\n    </div>\n\n    <button \n      @click="sendToCart()"\n      class="w-full py-2 bg-[#fa6432] text-white rounded-xl text-xs font-bold hover:bg-[#ff8559] transition cursor-pointer shadow-sm"\n    >\n      $dispatch(\'item-added\') &rarr;\n    </button>\n  </div>\n\n  <!-- Component B: Event Receiver -->\n  <div \n    x-data="{\n      eventsReceived: [],\n      totalSpent: 0\n    }"\n    @item-added.window="\n      eventsReceived.unshift($event.detail);\n      totalSpent += $event.detail.price;\n      if (eventsReceived.length > 3) eventsReceived.pop();\n    "\n    class="p-4 bg-sky-50 dark:bg-sky-950/40 rounded-xl border border-sky-100 dark:border-sky-900/50 space-y-3"\n  >\n    <div class="flex justify-between items-center text-xs text-sky-900 dark:text-sky-200">\n      <span class="font-bold">Cart Listener Component</span>\n      <span class="font-bold text-[#fa6432]" x-text="\'Total: $\' + totalSpent"></span>\n    </div>\n\n    <div class="space-y-1">\n      <template x-for="(ev, idx) in eventsReceived" :key="idx">\n        <div class="text-[11px] bg-white dark:bg-slate-800 p-2 rounded-lg flex justify-between border border-slate-200 dark:border-slate-700">\n          <span x-text="ev.product + \' ($\' + ev.price + \')\'"></span>\n          <span class="font-mono text-slate-400 text-[10px]" x-text="ev.time"></span>\n        </div>\n      </template>\n      <div x-show="eventsReceived.length === 0" class="text-xs text-slate-400 italic">\n        Awaiting events from sender...\n      </div>\n    </div>\n  </div>\n</div>',
+  },
+  {
+    id: 'lesson-14-form-validation',
+    title: '14. Form Validation & Instant Feedback',
+    description:
+      'Real-time form input validation (email, password strength, terms checkbox), error banners, and submit guard.',
+    category: 'Components',
+    difficulty: 'Intermediate',
+    tags: ['Forms', 'Validation', 'Feedback', 'UX'],
+    isDefault: true,
+    createdAt: 1726591300000,
+    updatedAt: 1726591300000,
+    code: '<!-- \n  ============================================================\n  LESSON 14: FORM VALIDATION & INSTANT FEEDBACK\n  Thomas More Applied Informatics / Tech Lab\n  ------------------------------------------------------------\n  Core Directives introduced:\n  - Real-time getters checking form rules on every keystroke.\n  - Dynamic error styling and helper messages.\n  - Disabled submit button until entire form satisfies constraints.\n  ============================================================\n-->\n\n<div \n  x-data="{\n    email: \'\',\n    password: \'\',\n    agreed: false,\n    submitted: false,\n    get emailValid() {\n      return /^[^s@]+@[^s@]+.[^s@]+$/.test(this.email);\n    },\n    get passwordValid() {\n      return this.password.length >= 8;\n    },\n    get isFormValid() {\n      return this.emailValid && this.passwordValid && this.agreed;\n    },\n    handleSubmit() {\n      if (!this.isFormValid) return;\n      this.submitted = true;\n    }\n  }"\n  class="max-w-md mx-auto p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 font-sans space-y-5"\n>\n  <!-- Header -->\n  <div class="border-b border-slate-100 dark:border-slate-800 pb-3">\n    <h2 class="text-xl font-bold text-[#00283c] dark:text-white">Instant Validation Form</h2>\n    <p class="text-xs text-slate-500 dark:text-slate-400">Live constraint evaluation with reactive getters</p>\n  </div>\n\n  <form @submit.prevent="handleSubmit()" class="space-y-4 text-xs">\n    <!-- Email Field -->\n    <div>\n      <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Student Email Address</label>\n      <input \n        type="email" \n        x-model="email"\n        placeholder="student@thomasmore.be"\n        class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border rounded-xl text-xs focus:outline-none transition dark:text-white"\n        :class="{\n          \'border-slate-200 dark:border-slate-700\': !email,\n          \'border-emerald-500 ring-1 ring-emerald-500\': email && emailValid,\n          \'border-rose-500 ring-1 ring-rose-500\': email && !emailValid\n        }"\n      />\n      <span x-show="email && !emailValid" class="text-[10px] text-rose-500 font-semibold block mt-1">Please provide a valid email structure.</span>\n    </div>\n\n    <!-- Password Field -->\n    <div>\n      <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Password (min 8 chars)</label>\n      <input \n        type="password" \n        x-model="password"\n        placeholder="••••••••"\n        class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border rounded-xl text-xs focus:outline-none transition dark:text-white"\n        :class="{\n          \'border-slate-200 dark:border-slate-700\': !password,\n          \'border-emerald-500 ring-1 ring-emerald-500\': password && passwordValid,\n          \'border-rose-500 ring-1 ring-rose-500\': password && !passwordValid\n        }"\n      />\n      <div class="flex justify-between items-center mt-1">\n        <span class="text-[10px] text-slate-400" x-text="password.length + \'/8 characters\'"></span>\n        <span x-show="passwordValid" class="text-[10px] text-emerald-500 font-semibold">Strong Password</span>\n      </div>\n    </div>\n\n    <!-- Terms Checkbox -->\n    <label class="flex items-center gap-2 text-slate-600 dark:text-slate-300 cursor-pointer select-none">\n      <input type="checkbox" x-model="agreed" class="rounded text-[#fa6432] focus:ring-[#fa6432]" />\n      <span>I agree to the Academic Code of Conduct</span>\n    </label>\n\n    <!-- Submit Button Guarded by isFormValid -->\n    <button \n      type="submit"\n      :disabled="!isFormValid"\n      class="w-full py-2.5 bg-[#fa6432] text-white font-bold rounded-xl hover:bg-[#ff8559] disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer shadow-sm"\n    >\n      Register Student Account\n    </button>\n  </form>\n\n  <div x-show="submitted" class="p-3 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 rounded-xl border border-emerald-200 dark:border-emerald-800 text-xs text-center font-bold">\n    Registration submitted successfully!\n  </div>\n</div>',
+  },
+  {
+    id: 'lesson-15-search-filter',
+    title: '15. Search Filter & Multi-Column Sorting',
+    description:
+      'Client-side live search filtering across multiple fields, category filter pills, and column sorting.',
+    category: 'Components',
+    difficulty: 'Intermediate',
+    tags: ['Search', 'Filter', 'Sorting', 'Tables'],
+    isDefault: true,
+    createdAt: 1726591400000,
+    updatedAt: 1726591400000,
+    code: '<!-- \n  ============================================================\n  LESSON 15: SEARCH FILTER & MULTI-COLUMN SORTING\n  Thomas More Applied Informatics / Tech Lab\n  ------------------------------------------------------------\n  Core Directives introduced:\n  - Reactive computed array filtering using a getter.\n  - Multi-condition filtering (text search + category pill).\n  - Dynamic ascending and descending column sort toggles.\n  ============================================================\n-->\n\n<div \n  x-data="{\n    search: \'\',\n    selectedCategory: \'All\',\n    sortBy: \'score\',\n    sortAsc: false,\n    students: [\n      { id: 1, name: \'Lucas Peeters\', category: \'Frontend\', score: 94 },\n      { id: 2, name: \'Emma De Smet\', category: \'Backend\', score: 88 },\n      { id: 3, name: \'Noah Claes\', category: \'Frontend\', score: 78 },\n      { id: 4, name: \'Olivia Maes\', category: \'DevOps\', score: 92 },\n      { id: 5, name: \'Liam Jacobs\', category: \'Backend\', score: 85 }\n    ],\n    get filteredStudents() {\n      return this.students\n        .filter(s => {\n          const matchCat = this.selectedCategory === \'All\' || s.category === this.selectedCategory;\n          const matchSearch = s.name.toLowerCase().includes(this.search.toLowerCase());\n          return matchCat && matchSearch;\n        })\n        .sort((a, b) => {\n          const modifier = this.sortAsc ? 1 : -1;\n          if (a[this.sortBy] < b[this.sortBy]) return -1 * modifier;\n          if (a[this.sortBy] > b[this.sortBy]) return 1 * modifier;\n          return 0;\n        });\n    }\n  }"\n  class="max-w-lg mx-auto p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 font-sans space-y-4"\n>\n  <!-- Header -->\n  <div class="border-b border-slate-100 dark:border-slate-800 pb-3">\n    <h2 class="text-xl font-bold text-[#00283c] dark:text-white">Student Leaderboard Filter</h2>\n    <p class="text-xs text-slate-500 dark:text-slate-400">Search by student name, filter track, and sort scores</p>\n  </div>\n\n  <!-- Search and Categories -->\n  <div class="space-y-2">\n    <input \n      type="text" \n      x-model="search"\n      placeholder="Search student..."\n      class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:border-[#fa6432] dark:text-white"\n    />\n\n    <div class="flex gap-1.5 overflow-x-auto text-xs">\n      <template x-for="cat in [\'All\', \'Frontend\', \'Backend\', \'DevOps\']" :key="cat">\n        <button \n          @click="selectedCategory = cat"\n          class="px-2.5 py-1 rounded-lg font-semibold transition cursor-pointer"\n          :class="selectedCategory === cat ? \'bg-[#fa6432] text-white\' : \'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200\'"\n          x-text="cat"\n        ></button>\n      </template>\n    </div>\n  </div>\n\n  <!-- Table -->\n  <div class="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden text-xs">\n    <table class="w-full text-left">\n      <thead class="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-semibold border-b border-slate-200 dark:border-slate-700">\n        <tr>\n          <th class="p-2.5">Name</th>\n          <th class="p-2.5">Track</th>\n          <th class="p-2.5 text-right cursor-pointer" @click="sortBy = \'score\'; sortAsc = !sortAsc">\n            Score <span x-text="sortBy === \'score\' ? (sortAsc ? \'▲\' : \'▼\') : \'\'"></span>\n          </th>\n        </tr>\n      </thead>\n      <tbody class="divide-y divide-slate-100 dark:divide-slate-800">\n        <template x-for="s in filteredStudents" :key="s.id">\n          <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/40">\n            <td class="p-2.5 font-medium text-slate-800 dark:text-white" x-text="s.name"></td>\n            <td class="p-2.5 text-slate-500" x-text="s.category"></td>\n            <td class="p-2.5 text-right font-bold text-[#fa6432]" x-text="s.score + \'%\'"></td>\n          </tr>\n        </template>\n      </tbody>\n    </table>\n  </div>\n</div>',
+  },
+  {
+    id: 'lesson-16-toast-notifications',
+    title: '16. Toast Notifications System',
+    description:
+      'Reactive notification queue with auto-dismiss timer, stack animation, and dismiss triggers.',
+    category: 'Components',
+    difficulty: 'Intermediate',
+    tags: ['Toast', 'Notifications', 'Feedback', 'Timer'],
+    isDefault: true,
+    createdAt: 1726591500000,
+    updatedAt: 1726591500000,
+    code: '<!-- \n  ============================================================\n  LESSON 16: TOAST NOTIFICATIONS SYSTEM\n  Thomas More Applied Informatics / Tech Lab\n  ------------------------------------------------------------\n  Core Directives introduced:\n  - Reactive notifications array acting as an in-memory queue.\n  - Automatic removal using setTimeout.\n  - Smooth slide-in and fade animations with x-transition.\n  ============================================================\n-->\n\n<div \n  x-data="{\n    toasts: [],\n    addToast(message, type = \'success\') {\n      const id = Date.now();\n      this.toasts.push({ id, message, type });\n      setTimeout(() => this.removeToast(id), 3500);\n    },\n    removeToast(id) {\n      this.toasts = this.toasts.filter(t => t.id !== id);\n    }\n  }"\n  class="max-w-lg mx-auto p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 font-sans space-y-6 relative"\n>\n  <!-- Header -->\n  <div class="border-b border-slate-100 dark:border-slate-800 pb-3">\n    <h2 class="text-xl font-bold text-[#00283c] dark:text-white">Reactive Toast Queue</h2>\n    <p class="text-xs text-slate-500 dark:text-slate-400">Trigger ephemeral feedback banners with auto-dismiss</p>\n  </div>\n\n  <!-- Trigger Buttons -->\n  <div class="flex flex-wrap gap-2">\n    <button \n      @click="addToast(\'Project compiled successfully!\', \'success\')"\n      class="px-3 py-2 bg-emerald-600 text-white rounded-xl text-xs font-semibold hover:bg-emerald-700 transition cursor-pointer"\n    >\n      + Success Toast\n    </button>\n    <button \n      @click="addToast(\'Submission deadline in 2 hours\', \'warning\')"\n      class="px-3 py-2 bg-amber-500 text-white rounded-xl text-xs font-semibold hover:bg-amber-600 transition cursor-pointer"\n    >\n      + Warning Toast\n    </button>\n    <button \n      @click="addToast(\'Compilation syntax error detected\', \'error\')"\n      class="px-3 py-2 bg-rose-600 text-white rounded-xl text-xs font-semibold hover:bg-rose-700 transition cursor-pointer"\n    >\n      + Error Toast\n    </button>\n  </div>\n\n  <!-- Toast Stack Container -->\n  <div class="fixed bottom-4 right-4 z-50 space-y-2 max-w-xs w-full pointer-events-none">\n    <template x-for="t in toasts" :key="t.id">\n      <div \n        x-transition:enter="transition ease-out duration-200"\n        x-transition:enter-start="opacity-0 translate-y-3 scale-95"\n        x-transition:enter-end="opacity-100 translate-y-0 scale-100"\n        x-transition:leave="transition ease-in duration-150"\n        x-transition:leave-start="opacity-100 scale-100"\n        x-transition:leave-end="opacity-0 scale-95"\n        class="pointer-events-auto p-3 rounded-xl shadow-xl border flex items-center justify-between gap-3 text-xs"\n        :class="{\n          \'bg-emerald-50 dark:bg-emerald-950 border-emerald-300 text-emerald-900 dark:text-emerald-100\': t.type === \'success\',\n          \'bg-amber-50 dark:bg-amber-950 border-amber-300 text-amber-900 dark:text-amber-100\': t.type === \'warning\',\n          \'bg-rose-50 dark:bg-rose-950 border-rose-300 text-rose-900 dark:text-rose-100\': t.type === \'error\'\n        }"\n      >\n        <span x-text="t.message"></span>\n        <button @click="removeToast(t.id)" class="text-xs font-bold opacity-60 hover:opacity-100 cursor-pointer">&times;</button>\n      </div>\n    </template>\n  </div>\n</div>',
+  },
+  {
+    id: 'lesson-17-watchers',
+    title: '17. State Watchers & Side Effects ($watch)',
+    description:
+      'Execute side effects and asynchronous tasks whenever reactive properties change using $watch.',
     category: 'Advanced',
     difficulty: 'Advanced',
-    tags: ['Alpine.store', 'Global State', 'Cart'],
+    tags: ['$watch', 'Side Effects', 'Reactivity', 'State'],
     isDefault: true,
-    createdAt: Date.now() - 40000,
-    updatedAt: Date.now() - 40000,
-    code: `<!--
-  ============================================================
-  🎓 LESSON 07: GLOBAL SHARED STATE WITH ALPINE.STORE
-  Thomas More Applied Informatics / Tech Lab
-  ------------------------------------------------------------
-  Core Principles:
-  • Alpine.store(name, object): Creates a reactive store accessible
-    from ANY component on the page via the '$store.name' magic property.
-  • No prop drilling, no event bubbling needed for shared application state!
-  • Getters in stores reactively re-evaluate across all listening components.
-  ============================================================
--->
-
-<div class="max-w-lg mx-auto space-y-6 font-sans">
-  <!--
-    [ALPINE STORE INITIALIZATION]
-    • The 'alpine:init' event fires right before Alpine boots.
-    • We register the global 'library' store with books, toggle action, and getter.
-  -->
-  <script>
-    document.addEventListener('alpine:init', () => {
-      Alpine.store('library', {
-        books: [
-          { id: 1, title: 'Clean Code in JavaScript', author: 'Robert Martin', borrowed: false },
-          { id: 2, title: 'Alpine.js Up and Running', author: 'Caleb Porzio', borrowed: true },
-          { id: 3, title: 'Modern Tailwind CSS v4', author: 'Adam Wathan', borrowed: false }
-        ],
-        toggleBorrow(id) {
-          const book = this.books.find(b => b.id === id);
-          if (book) book.borrowed = !book.borrowed;
-        },
-        get borrowedCount() {
-          return this.books.filter(b => b.borrowed).length;
-        }
-      });
-    });
-  </script>
-
-  <!--
-    [COMPONENT 1: HEADER & LIVE STATS]
-    • Note: 'x-data' without parameters creates an isolated Alpine component.
-    • Reads from '$store.library.borrowedCount'.
-  -->
-  <div x-data class="p-4 bg-[#00283c] text-white rounded-2xl flex items-center justify-between shadow-md">
-    <div>
-      <span class="text-[10px] text-[#fa6432] uppercase tracking-wider font-bold">Thomas More Campus Library</span>
-      <h3 class="text-base font-bold">Global State Store Demo</h3>
-    </div>
-    <div class="text-right">
-      <span class="text-xs text-slate-300 block">Borrowed Books:</span>
-      <!--
-        [ALPINE MAGIC PROPERTY: $store]
-        • $store.library.borrowedCount automatically recalculates when any book is borrowed or returned!
-      -->
-      <span class="text-xl font-black text-[#fa6432]" x-text="$store.library.borrowedCount"></span>
-    </div>
-  </div>
-
-  <!--
-    [COMPONENT 2: BOOK CATALOG]
-    • This is a completely independent DOM tree with its own 'x-data'.
-    • Interacts with the same store seamlessly!
-  -->
-  <div x-data class="p-5 bg-white rounded-2xl shadow-lg border border-slate-100">
-    <h4 class="text-sm font-bold text-[#00283c] mb-3">Available Catalog</h4>
-    <div class="space-y-2.5">
-      <!--
-        [ALPINE DIRECTIVE: x-for iterating $store collection]
-        • Loops over $store.library.books reactively.
-      -->
-      <template x-for="book in $store.library.books" :key="book.id">
-        <div class="p-3.5 rounded-xl border border-slate-200 flex items-center justify-between hover:border-slate-300 transition">
-          <div>
-            <h5 class="text-xs font-bold text-slate-800" x-text="book.title"></h5>
-            <p class="text-[11px] text-slate-500" x-text="book.author"></p>
-          </div>
-          <!--
-            [ALPINE DIRECTIVES: @click, :class, & x-text on Store Action]
-            • Calls $store.library.toggleBorrow(book.id) when clicked.
-            • Reactively updates button label and color based on book.borrowed.
-          -->
-          <button 
-            @click="$store.library.toggleBorrow(book.id)"
-            :class="book.borrowed ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-[#fa6432] text-white hover:bg-[#e25325]'"
-            class="px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer"
-            x-text="book.borrowed ? 'Return Book' : 'Borrow'"
-          ></button>
-        </div>
-      </template>
-    </div>
-  </div>
-</div>`,
+    createdAt: 1726591600000,
+    updatedAt: 1726591600000,
+    code: '<!-- \n  ============================================================\n  LESSON 17: STATE WATCHERS & SIDE EFFECTS ($watch)\n  Thomas More Applied Informatics / Tech Lab\n  ------------------------------------------------------------\n  Core Directives introduced:\n  - $watch(\'property\', (newValue, oldValue) => ...)\n  - Ideal for reacting to state changes without polluting markup.\n  - Useful for auto-saving, analytics, or secondary data fetching.\n  ============================================================\n-->\n\n<div \n  x-data="{\n    quantity: 1,\n    unitPrice: 25,\n    discountRate: 0,\n    historyLogs: [],\n    get total() {\n      const subtotal = this.quantity * this.unitPrice;\n      return subtotal - (subtotal * this.discountRate);\n    }\n  }"\n  x-init="\n    // Watch quantity changes\n    $watch(\'quantity\', (newVal, oldVal) => {\n      historyLogs.unshift({\n        id: Date.now(),\n        msg: \'Quantity changed from \' + oldVal + \' to \' + newVal,\n        time: new Date().toLocaleTimeString()\n      });\n      if (newVal >= 5) {\n        discountRate = 0.15; // 15% bulk discount\n      } else {\n        discountRate = 0;\n      }\n      if (historyLogs.length > 5) historyLogs.pop();\n    });\n  "\n  class="max-w-lg mx-auto p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 font-sans space-y-6"\n>\n  <!-- Header -->\n  <div class="border-b border-slate-100 dark:border-slate-800 pb-3">\n    <h2 class="text-xl font-bold text-[#00283c] dark:text-white">Reactive Watcher Studio</h2>\n    <p class="text-xs text-slate-500 dark:text-slate-400">Observe mutations and compute automated bulk pricing</p>\n  </div>\n\n  <!-- Interactive Controls -->\n  <div class="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/80 dark:border-slate-700 space-y-3 text-xs">\n    <div class="flex items-center justify-between">\n      <span class="font-semibold text-slate-700 dark:text-slate-200">Course License Quantity</span>\n      <div class="flex items-center gap-2">\n        <button \n          @click="if (quantity > 1) quantity--"\n          class="w-7 h-7 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 font-bold hover:bg-slate-100 dark:hover:bg-slate-600 cursor-pointer"\n        >-</button>\n        <span class="w-8 text-center font-bold text-sm text-[#fa6432]" x-text="quantity"></span>\n        <button \n          @click="quantity++"\n          class="w-7 h-7 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 font-bold hover:bg-slate-100 dark:hover:bg-slate-600 cursor-pointer"\n        >+</button>\n      </div>\n    </div>\n\n    <!-- Calculated Pricing Box -->\n    <div class="pt-3 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center">\n      <div>\n        <span class="text-slate-400 block text-[11px]">Computed Total</span>\n        <span x-show="discountRate > 0" class="text-[10px] text-emerald-500 font-bold">15% Bulk Discount Applied</span>\n      </div>\n      <div class="text-right">\n        <span class="text-xl font-black text-[#00283c] dark:text-white" x-text="\'$\' + total.toFixed(2)"></span>\n      </div>\n    </div>\n  </div>\n\n  <!-- Real-Time Watcher Log Table -->\n  <div>\n    <span class="text-[10px] font-bold uppercase tracking-wider text-[#fa6432] block mb-1.5">$watch Event Log</span>\n    <div class="space-y-1">\n      <template x-for="log in historyLogs" :key="log.id">\n        <div class="p-2 bg-slate-50 dark:bg-slate-800 rounded-lg text-xs flex justify-between border border-slate-200 dark:border-slate-700">\n          <span class="text-slate-700 dark:text-slate-300" x-text="log.msg"></span>\n          <span class="font-mono text-slate-400 text-[10px]" x-text="log.time"></span>\n        </div>\n      </template>\n    </div>\n  </div>\n</div>',
   },
   {
-    id: 'lesson-08-quiz-app',
-    title: '08. Student Project: Alpine Quiz App',
+    id: 'lesson-18-lifecycle-nexttick',
+    title: '18. Component Lifecycle (x-init, $nextTick)',
     description:
-      'Full interactive quiz with question progression, score tracking, and result screen.',
-    category: 'Projects',
-    difficulty: 'Intermediate',
-    tags: ['Project', 'Quiz', 'Full Component', 'Tailwind v4'],
+      'Master component initialization, mock asynchronous API fetching, and precise DOM measuring via $nextTick.',
+    category: 'Advanced',
+    difficulty: 'Advanced',
+    tags: ['x-init', '$nextTick', 'Lifecycle', 'DOM Updates'],
     isDefault: true,
-    createdAt: Date.now() - 30000,
-    updatedAt: Date.now() - 30000,
-    code: `<!--
-  ============================================================
-  🎓 LESSON 08: CAPSTONE STUDENT QUIZ APPLICATION
-  Thomas More Applied Informatics / Tech Lab
-  ------------------------------------------------------------
-  This real-world project unifies:
-  • x-data: State machine managing steps, score, questions & answers.
-  • x-show & x-transition: Phase switches between question view and results.
-  • x-for: Dynamic choice buttons with computed classes.
-  • :style: Dynamic width calculation for animated progress bar.
-  • Conditional styling: Highlights correct (green) and incorrect (red) choices.
-  ============================================================
--->
-
-<!--
-  [ALPINE DIRECTIVE: x-data State Machine]
-  • 'currentStep': Index of the current question.
-  • 'score': Running tally of correct answers.
-  • 'selectedAnswer': Index picked by the student.
-  • 'isAnswered': Locks options after an answer is chosen.
--->
-<div 
-  x-data="{
-    currentStep: 0,
-    score: 0,
-    selectedAnswer: null,
-    isAnswered: false,
-    questions: [
-      {
-        question: 'Which Alpine.js directive is used to declare reactive component state?',
-        options: ['x-model', 'x-data', 'x-state', 'x-init'],
-        correctIndex: 1,
-        explanation: 'x-data defines the scope and reactive object properties for that DOM node.'
-      },
-      {
-        question: 'What is the shorthand syntax for x-on:click in Alpine?',
-        options: [':click', '#click', '@click', '$click'],
-        correctIndex: 2,
-        explanation: '@ is the convenient shorthand for the x-on directive.'
-      },
-      {
-        question: 'Which magic property is used to dispatch custom events?',
-        options: ['$dispatch', '$emit', '$trigger', '$broadcast'],
-        correctIndex: 0,
-        explanation: '$dispatch triggers browser CustomEvents that bubble up the DOM tree.'
-      }
-    ],
-    selectOption(index) {
-      if (this.isAnswered) return;
-      this.selectedAnswer = index;
-      this.isAnswered = true;
-      if (index === this.questions[this.currentStep].correctIndex) {
-        this.score++;
-      }
-    },
-    nextQuestion() {
-      this.selectedAnswer = null;
-      this.isAnswered = false;
-      this.currentStep++;
-    },
-    restart() {
-      this.currentStep = 0;
-      this.score = 0;
-      this.selectedAnswer = null;
-      this.isAnswered = false;
-    }
-  }"
-  class="max-w-md mx-auto p-6 bg-white rounded-2xl shadow-xl border border-slate-100 font-sans"
->
-  <!-- Quiz Header -->
-  <div class="flex items-center justify-between pb-4 border-b border-slate-100">
-    <div>
-      <span class="text-[10px] font-extrabold uppercase tracking-wider text-[#fa6432]">Thomas More Tech Lab</span>
-      <h2 class="text-lg font-bold text-[#00283c]">Alpine Knowledge Check</h2>
-    </div>
-    <!--
-      [ALPINE DIRECTIVE: x-show & x-text]
-      • Shows current step indicator only while questions remain.
-    -->
-    <div x-show="currentStep < questions.length" class="text-right">
-      <span class="text-xs font-semibold text-slate-500">
-        Question <span x-text="currentStep + 1"></span> of <span x-text="questions.length"></span>
-      </span>
-    </div>
-  </div>
-
-  <!--
-    [ACTIVE QUESTION VIEW: x-show="currentStep < questions.length"]
-    • Visible while the quiz is in progress.
-  -->
-  <div x-show="currentStep < questions.length" class="mt-5 space-y-4">
-    <!-- Progress Bar with :style calculation -->
-    <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-      <!--
-        [ALPINE DIRECTIVE: :style]
-        • Dynamically calculates the progress percentage and animates width smoothly!
-      -->
-      <div 
-        class="h-full bg-[#fa6432] transition-all duration-300"
-        :style="'width: ' + ((currentStep / questions.length) * 100) + '%'"
-      ></div>
-    </div>
-
-    <!--
-      [ALPINE DIRECTIVE: x-text on Question Title]
-      • Displays question title from the active step.
-    -->
-    <h3 class="text-sm font-bold text-slate-800 leading-snug" x-text="questions[currentStep].question"></h3>
-
-    <!-- Options List -->
-    <div class="space-y-2">
-      <!--
-        [ALPINE DIRECTIVE: x-for looping through options]
-        • (option, idx) provides both the string and the index.
-      -->
-      <template x-for="(option, idx) in questions[currentStep].options" :key="idx">
-        <!--
-          [ALPINE DIRECTIVES: @click, :disabled, & Object-Syntax :class]
-          • @click="selectOption(idx)": Handles user choice.
-          • :disabled="isAnswered": Prevents selecting a second answer.
-          • :class="{ ... }": Toggles green background if correct, red if incorrect!
-        -->
-        <button 
-          @click="selectOption(idx)"
-          :disabled="isAnswered"
-          :class="{
-            'border-slate-200 hover:border-slate-300 hover:bg-slate-50': !isAnswered,
-            'bg-emerald-50 border-emerald-500 text-emerald-900 font-bold': isAnswered && idx === questions[currentStep].correctIndex,
-            'bg-red-50 border-red-400 text-red-900': isAnswered && selectedAnswer === idx && idx !== questions[currentStep].correctIndex,
-            'opacity-50': isAnswered && selectedAnswer !== idx && idx !== questions[currentStep].correctIndex
-          }"
-          class="w-full text-left p-3 rounded-xl border text-xs font-medium transition cursor-pointer flex items-center justify-between"
-        >
-          <span x-text="option"></span>
-          <span x-show="isAnswered && idx === questions[currentStep].correctIndex">✓</span>
-          <span x-show="isAnswered && selectedAnswer === idx && idx !== questions[currentStep].correctIndex">✗</span>
-        </button>
-      </template>
-    </div>
-
-    <!--
-      [ALPINE DIRECTIVE: x-show="isAnswered" with x-transition]
-      • Reveals educational explanation only after the student makes a choice.
-    -->
-    <div x-show="isAnswered" x-transition class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600">
-      <p class="font-bold text-[#00283c] mb-1">Explanation:</p>
-      <p x-text="questions[currentStep].explanation"></p>
-    </div>
-
-    <!--
-      [ALPINE DIRECTIVE: Next Question Button]
-      • Appears once answered to advance the state machine.
-    -->
-    <div x-show="isAnswered" class="pt-2 flex justify-end">
-      <button 
-        @click="nextQuestion()"
-        class="px-5 py-2 bg-[#fa6432] hover:bg-[#e25325] text-white rounded-xl text-xs font-bold transition shadow-md cursor-pointer"
-      >
-        <span x-text="currentStep + 1 === questions.length ? 'Show Results' : 'Next Question →'"></span>
-      </button>
-    </div>
-  </div>
-
-  <!--
-    [FINAL RESULTS SCREEN: x-show="currentStep >= questions.length"]
-    • Fades in when all questions are answered.
-  -->
-  <div x-show="currentStep >= questions.length" x-transition class="py-8 text-center space-y-4">
-    <div class="w-16 h-16 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-3xl">
-      🏆
-    </div>
-    <div>
-      <h3 class="text-xl font-bold text-[#00283c]">Quiz Completed!</h3>
-      <p class="text-xs text-slate-500 mt-1">Here is how you scored on Alpine basics:</p>
-    </div>
-
-    <!-- Score Display with dynamic feedback message -->
-    <div class="p-4 bg-slate-50 rounded-2xl inline-block border border-slate-200 min-w-[180px]">
-      <span class="text-3xl font-black text-[#fa6432]" x-text="score"></span>
-      <span class="text-slate-400 font-bold text-lg"> / <span x-text="questions.length"></span></span>
-      <p class="text-[11px] font-semibold text-slate-600 mt-1" x-text="score === questions.length ? 'Perfect Score! 🌟' : score >= 2 ? 'Great Job! 👍' : 'Keep Practicing! 💪'"></p>
-    </div>
-
-    <!--
-      [ALPINE DIRECTIVE: @click="restart()"]
-      • Resets state machine back to step 0 and score 0.
-    -->
-    <div>
-      <button 
-        @click="restart()"
-        class="px-6 py-2.5 bg-[#00283c] hover:bg-[#0b384f] text-white rounded-xl text-xs font-bold transition shadow-md cursor-pointer"
-      >
-        Retake Quiz
-      </button>
-    </div>
-  </div>
-</div>`,
+    createdAt: 1726591700000,
+    updatedAt: 1726591700000,
+    code: '<!-- \n  ============================================================\n  LESSON 18: COMPONENT LIFECYCLE (x-init, $nextTick)\n  Thomas More Applied Informatics / Tech Lab\n  ------------------------------------------------------------\n  Core Directives introduced:\n  - x-init    -> Runs immediately when the component initializes.\n  - $nextTick -> Defers execution until Alpine has finished updating the DOM.\n  ============================================================\n-->\n\n<div \n  x-data="{\n    loading: true,\n    users: [],\n    listHeight: 0,\n    async loadUsers() {\n      this.loading = true;\n      // Simulate an asynchronous API network delay\n      await new Promise(r => setTimeout(r, 1200));\n      this.users = [\n        { id: 1, name: \'Grace Hopper\', role: \'Compiler Pioneer\' },\n        { id: 2, name: \'Alan Turing\', role: \'Computation Foundations\' },\n        { id: 3, name: \'Margaret Hamilton\', role: \'Apollo Flight Software\' }\n      ];\n      this.loading = false;\n\n      // Use $nextTick to ensure DOM is rendered before measuring height\n      this.$nextTick(() => {\n        if (this.$refs.userContainer) {\n          this.listHeight = this.$refs.userContainer.offsetHeight;\n        }\n      });\n    }\n  }"\n  x-init="loadUsers()"\n  class="max-w-lg mx-auto p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 font-sans space-y-6"\n>\n  <!-- Header -->\n  <div class="border-b border-slate-100 dark:border-slate-800 pb-3 flex items-center justify-between">\n    <div>\n      <h2 class="text-xl font-bold text-[#00283c] dark:text-white">Lifecycle & $nextTick</h2>\n      <p class="text-xs text-slate-500 dark:text-slate-400">Async fetching with x-init & accurate DOM measuring</p>\n    </div>\n    <button \n      @click="loadUsers()" \n      class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-xs font-semibold rounded-lg transition cursor-pointer"\n    >\n      Reload API\n    </button>\n  </div>\n\n  <!-- Loading State Skeleton -->\n  <div x-show="loading" class="space-y-2 py-4">\n    <div class="h-10 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse"></div>\n    <div class="h-10 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse"></div>\n    <div class="h-10 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse"></div>\n  </div>\n\n  <!-- Loaded User Items -->\n  <div x-show="!loading" x-ref="userContainer" class="space-y-2">\n    <template x-for="user in users" :key="user.id">\n      <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 flex justify-between items-center text-xs">\n        <div>\n          <span class="font-bold text-slate-800 dark:text-white" x-text="user.name"></span>\n          <span class="text-slate-400 block text-[10px]" x-text="user.role"></span>\n        </div>\n        <span class="px-2 py-0.5 bg-[#fa6432]/10 text-[#fa6432] rounded text-[10px] font-semibold">Active</span>\n      </div>\n    </template>\n  </div>\n\n  <!-- DOM Measurement Banner -->\n  <div x-show="!loading" class="p-3 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 rounded-xl border border-emerald-200 dark:border-emerald-800 text-xs flex justify-between items-center">\n    <span>DOM height measured inside $nextTick():</span>\n    <strong class="font-mono text-sm" x-text="listHeight + \'px\'"></strong>\n  </div>\n</div>',
+  },
+  {
+    id: 'lesson-19-alpine-store',
+    title: '19. Global State & Stores (Alpine.store)',
+    description:
+      'Manage global reactive stores accessible across independent, isolated components.',
+    category: 'Advanced',
+    difficulty: 'Advanced',
+    tags: ['Alpine.store', 'Global State', 'Shopping Cart', 'Stores'],
+    isDefault: true,
+    createdAt: 1726591800000,
+    updatedAt: 1726591800000,
+    code: '<!-- \n  ============================================================\n  LESSON 19: GLOBAL STATE & STORES (Alpine.store)\n  Thomas More Applied Informatics / Tech Lab\n  ------------------------------------------------------------\n  Core Directives introduced:\n  - Alpine.store(\'name\', { ... }) -> Global reactive store.\n  - $store.name.property          -> Reads store properties in any component.\n  ============================================================\n-->\n\n<!-- Store Initialization Script -->\n<script>\n  document.addEventListener(\'alpine:init\', () => {\n    Alpine.store(\'labCart\', {\n      items: [\n        { id: 1, title: \'Alpine.js Lab Handbook\', price: 19 }\n      ],\n      add(title, price) {\n        this.items.push({ id: Date.now(), title, price });\n      },\n      remove(id) {\n        this.items = this.items.filter(i => i.id !== id);\n      },\n      get total() {\n        return this.items.reduce((sum, item) => sum + item.price, 0);\n      }\n    });\n  });\n</script>\n\n<div class="max-w-xl mx-auto p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 font-sans space-y-6">\n  <!-- Header with Global Cart Pill -->\n  <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">\n    <div>\n      <h2 class="text-xl font-bold text-[#00283c] dark:text-white">Global Store Architecture</h2>\n      <p class="text-xs text-slate-500 dark:text-slate-400">Two independent components sharing $store.labCart</p>\n    </div>\n    <div x-data class="px-3 py-1 bg-[#fa6432]/10 text-[#fa6432] rounded-full text-xs font-bold">\n      Cart (<span x-text="$store.labCart.items.length"></span>)\n    </div>\n  </div>\n\n  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">\n    <!-- Component 1: Course Catalog -->\n    <div x-data class="space-y-3">\n      <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Component 1: Catalog</h3>\n      <div class="space-y-2">\n        <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 flex justify-between items-center text-xs">\n          <div>\n            <span class="font-bold text-slate-800 dark:text-white">Tailwind v4 Masterclass</span>\n            <span class="text-slate-400 block">$29</span>\n          </div>\n          <button \n            @click="$store.labCart.add(\'Tailwind v4 Masterclass\', 29)"\n            class="px-2.5 py-1 bg-[#fa6432] text-white rounded-lg text-xs font-semibold hover:bg-[#ff8559] cursor-pointer"\n          >+ Add</button>\n        </div>\n\n        <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 flex justify-between items-center text-xs">\n          <div>\n            <span class="font-bold text-slate-800 dark:text-white">TypeScript in Practice</span>\n            <span class="text-slate-400 block">$35</span>\n          </div>\n          <button \n            @click="$store.labCart.add(\'TypeScript in Practice\', 35)"\n            class="px-2.5 py-1 bg-[#fa6432] text-white rounded-lg text-xs font-semibold hover:bg-[#ff8559] cursor-pointer"\n          >+ Add</button>\n        </div>\n      </div>\n    </div>\n\n    <!-- Component 2: Cart Summary -->\n    <div x-data class="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col justify-between text-xs">\n      <div>\n        <div class="flex justify-between items-center mb-3">\n          <h3 class="font-bold uppercase tracking-wider text-slate-400 text-[10px]">Component 2: Order</h3>\n          <span class="font-bold text-[#fa6432]" x-text="\'$\' + $store.labCart.total"></span>\n        </div>\n\n        <div class="space-y-1.5 max-h-40 overflow-y-auto">\n          <template x-for="item in $store.labCart.items" :key="item.id">\n            <div class="flex justify-between items-center p-1.5 bg-white dark:bg-slate-800 rounded-md border border-slate-200 dark:border-slate-700">\n              <span class="truncate font-medium text-slate-800 dark:text-white" x-text="item.title"></span>\n              <div class="flex items-center gap-2">\n                <span class="font-bold" x-text="\'$\' + item.price"></span>\n                <button @click="$store.labCart.remove(item.id)" class="text-rose-500 font-bold cursor-pointer">&times;</button>\n              </div>\n            </div>\n          </template>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>',
+  },
+  {
+    id: 'lesson-20-persist-plugin',
+    title: '20. Persistent State with LocalStorage ($persist)',
+    description:
+      'Seamlessly sync reactive data to browser localStorage with official @alpinejs/persist plugin.',
+    category: 'Advanced',
+    difficulty: 'Advanced',
+    tags: ['$persist', 'LocalStorage', 'Plugins', 'Persistence'],
+    isDefault: true,
+    createdAt: 1726591900000,
+    updatedAt: 1726591900000,
+    code: '<!-- \n  ============================================================\n  LESSON 20: PERSISTENT STATE WITH LOCALSTORAGE ($persist)\n  Thomas More Applied Informatics / Tech Lab\n  ------------------------------------------------------------\n  Core Directives introduced:\n  - $persist(initialValue) -> Official plugin binding state to localStorage.\n  - Changes persist across browser refreshes and tab closures!\n  ============================================================\n-->\n\n<div \n  x-data="{\n    studentNotes: $persist(\'Remember to prepare for the Alpine.js exam on Friday!\'),\n    savedDark: $persist(false).as(\'app_theme_dark\'),\n    favoriteFramework: $persist(\'Alpine.js\')\n  }"\n  class="max-w-lg mx-auto p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 font-sans space-y-6"\n>\n  <!-- Header -->\n  <div class="border-b border-slate-100 dark:border-slate-800 pb-3 flex justify-between items-center">\n    <div>\n      <h2 class="text-xl font-bold text-[#00283c] dark:text-white">Persistent Storage ($persist)</h2>\n      <p class="text-xs text-slate-500 dark:text-slate-400">Official @alpinejs/persist integration</p>\n    </div>\n    <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 font-semibold">\n      Auto-saving\n    </span>\n  </div>\n\n  <!-- Persistent Notes Textarea -->\n  <div>\n    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">\n      Student Scratchpad (Persists automatically)\n    </label>\n    <textarea \n      x-model="studentNotes"\n      rows="3"\n      class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:border-[#fa6432] dark:text-white"\n    ></textarea>\n  </div>\n\n  <!-- Framework Radio Selection -->\n  <div>\n    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">Favorite Reactive Tool</label>\n    <div class="flex gap-4 text-xs">\n      <template x-for="fw in [\'Alpine.js\', \'Vue.js\', \'React\']" :key="fw">\n        <label class="flex items-center gap-1.5 cursor-pointer text-slate-700 dark:text-slate-300">\n          <input type="radio" :value="fw" x-model="favoriteFramework" class="text-[#fa6432] focus:ring-[#fa6432]" />\n          <span x-text="fw"></span>\n        </label>\n      </template>\n    </div>\n  </div>\n\n  <!-- Refresh Verification Banner -->\n  <div class="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300">\n    <p>Try refreshing the browser page: all notes and options remain perfectly intact!</p>\n  </div>\n</div>',
+  },
+  {
+    id: 'lesson-21-intersect-plugin',
+    title: '21. Infinite Scroll & Viewport Visibility (x-intersect)',
+    description:
+      'Trigger actions and lazy load data when elements enter the screen using official @alpinejs/intersect.',
+    category: 'Advanced',
+    difficulty: 'Advanced',
+    tags: ['x-intersect', 'Intersection Observer', 'Scroll', 'Plugins'],
+    isDefault: true,
+    createdAt: 1726592000000,
+    updatedAt: 1726592000000,
+    code: '<!-- \n  ============================================================\n  LESSON 21: INFINITE SCROLL & VISIBILITY (x-intersect)\n  Thomas More Applied Informatics / Tech Lab\n  ------------------------------------------------------------\n  Core Directives introduced:\n  - x-intersect -> Fires callback when element scrolls into view.\n  - x-intersect:enter, x-intersect:leave\n  - Powered by IntersectionObserver API without external libraries.\n  ============================================================\n-->\n\n<div \n  x-data="{\n    articles: [\n      { id: 1, title: \'Getting Started with Reactive Components\' },\n      { id: 2, title: \'Mastering Tailwind v4 Design Systems\' },\n      { id: 3, title: \'Clean Architecture with Alpine Stores\' }\n    ],\n    page: 1,\n    loadingMore: false,\n    loadMoreArticles() {\n      if (this.loadingMore || this.page >= 3) return;\n      this.loadingMore = true;\n      setTimeout(() => {\n        const start = this.articles.length + 1;\n        this.articles.push(\n          { id: start, title: \'Advanced Technique #\' + start },\n          { id: start + 1, title: \'Performance Optimization #\' + (start + 1) }\n        );\n        this.page++;\n        this.loadingMore = false;\n      }, 800);\n    }\n  }"\n  class="max-w-lg mx-auto p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 font-sans space-y-4"\n>\n  <!-- Header -->\n  <div class="border-b border-slate-100 dark:border-slate-800 pb-3">\n    <h2 class="text-xl font-bold text-[#00283c] dark:text-white">Infinite Scroll with x-intersect</h2>\n    <p class="text-xs text-slate-500 dark:text-slate-400">Automatically loads items as you scroll to the bottom</p>\n  </div>\n\n  <!-- Scrollable Container -->\n  <div class="max-h-64 overflow-y-auto space-y-2.5 p-1 border border-slate-100 dark:border-slate-800 rounded-xl pr-2">\n    <template x-for="item in articles" :key="item.id">\n      <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs">\n        <span class="text-[10px] text-[#fa6432] font-mono font-bold block mb-0.5" x-text="\'ARTICLE #\' + item.id"></span>\n        <h4 class="font-bold text-slate-800 dark:text-white" x-text="item.title"></h4>\n      </div>\n    </template>\n\n    <!--\n      [ALPINE PLUGIN: x-intersect]\n      - Trigger element at the bottom of the feed.\n    -->\n    <div \n      x-intersect="loadMoreArticles()"\n      class="py-3 text-center text-xs text-slate-400"\n    >\n      <span x-show="loadingMore" class="text-[#fa6432] font-semibold">Loading additional articles...</span>\n      <span x-show="!loadingMore && page < 3">Scroll down to trigger loadMore</span>\n      <span x-show="page >= 3" class="text-emerald-500 font-bold">All articles loaded!</span>\n    </div>\n  </div>\n</div>',
+  },
+  {
+    id: 'lesson-22-mask-plugin',
+    title: '22. Input Masking (x-mask Plugin)',
+    description:
+      'Format phone numbers, credit card numbers, dates, and currencies strictly using official @alpinejs/mask.',
+    category: 'Advanced',
+    difficulty: 'Advanced',
+    tags: ['x-mask', 'Masking', 'Forms', 'Plugins'],
+    isDefault: true,
+    createdAt: 1726592100000,
+    updatedAt: 1726592100000,
+    code: '<!-- \n  ============================================================\n  LESSON 22: INPUT MASKING (x-mask)\n  Thomas More Applied Informatics / Tech Lab\n  ------------------------------------------------------------\n  Core Directives introduced:\n  - x-mask -> Formats input characters in real time as the user types.\n  - Supports phone formats, credit cards, dates, and currencies.\n  ============================================================\n-->\n\n<div \n  x-data="{\n    phone: \'\',\n    card: \'\',\n    date: \'\',\n    currency: \'\'\n  }"\n  class="max-w-md mx-auto p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 font-sans space-y-5"\n>\n  <!-- Header -->\n  <div class="border-b border-slate-100 dark:border-slate-800 pb-3">\n    <h2 class="text-xl font-bold text-[#00283c] dark:text-white">Strict Input Masking</h2>\n    <p class="text-xs text-slate-500 dark:text-slate-400">Powered by official @alpinejs/mask plugin</p>\n  </div>\n\n  <div class="space-y-4 text-xs">\n    <!-- Phone Mask -->\n    <div>\n      <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Phone Number (+32 (99) 999-999)</label>\n      <input \n        type="text" \n        x-model="phone"\n        x-mask="+32 (99) 999-999"\n        placeholder="+32 (03) 123-456"\n        class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:border-[#fa6432] dark:text-white font-mono"\n      />\n    </div>\n\n    <!-- Credit Card Mask -->\n    <div>\n      <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Payment Card (9999 9999 9999 9999)</label>\n      <input \n        type="text" \n        x-model="card"\n        x-mask="9999 9999 9999 9999"\n        placeholder="4500 1234 5678 9010"\n        class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:border-[#fa6432] dark:text-white font-mono"\n      />\n    </div>\n\n    <!-- Date of Birth Mask -->\n    <div>\n      <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Birthdate (DD/MM/YYYY)</label>\n      <input \n        type="text" \n        x-model="date"\n        x-mask="99/99/9999"\n        placeholder="17/09/2004"\n        class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:border-[#fa6432] dark:text-white font-mono"\n      />\n    </div>\n  </div>\n</div>',
+  },
+  {
+    id: 'lesson-23-focus-trap',
+    title: '23. Accessible Focus Management (@alpinejs/focus)',
+    description:
+      'Trap keyboard focus cleanly within modals and dialogs using the official @alpinejs/focus plugin and x-trap.',
+    category: 'Advanced',
+    difficulty: 'Advanced',
+    tags: ['@alpinejs/focus', 'x-trap', 'Accessibility', 'A11y'],
+    isDefault: true,
+    createdAt: 1726592200000,
+    updatedAt: 1726592200000,
+    code: '<!-- \n  ============================================================\n  LESSON 23: ACCESSIBLE FOCUS TRAP (@alpinejs/focus)\n  Thomas More Applied Informatics / Tech Lab\n  ------------------------------------------------------------\n  Core Directives introduced:\n  - x-trap -> Keeps Tab navigation strictly inside an active modal.\n  - Essential for WCAG 2.1 accessibility compliance.\n  ============================================================\n-->\n\n<div \n  x-data="{ \n    dialogOpen: false,\n    openDialog() { this.dialogOpen = true; },\n    closeDialog() { this.dialogOpen = false; }\n  }"\n  @keydown.escape.window="closeDialog()"\n  class="max-w-md mx-auto p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 font-sans space-y-6"\n>\n  <!-- Header -->\n  <div class="border-b border-slate-100 dark:border-slate-800 pb-3">\n    <h2 class="text-xl font-bold text-[#00283c] dark:text-white">Accessibility & Focus Trapping</h2>\n    <p class="text-xs text-slate-500 dark:text-slate-400">Strict keyboard navigation with @alpinejs/focus plugin</p>\n  </div>\n\n  <button \n    @click="openDialog()"\n    class="w-full py-3 bg-[#fa6432] text-white rounded-xl text-xs font-bold hover:bg-[#ff8559] transition cursor-pointer"\n  >\n    Launch Accessible Modal (Test Tab Key)\n  </button>\n\n  <!-- Modal Dialog with x-trap -->\n  <div \n    x-show="dialogOpen" \n    x-cloak\n    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"\n  >\n    <!--\n      [ALPINE PLUGIN DIRECTIVE: x-trap]\n      - Traps focus inside this modal div until closed!\n    -->\n    <div \n      x-trap="dialogOpen"\n      @click.outside="closeDialog()"\n      class="w-full max-w-sm bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xl space-y-4 text-xs"\n    >\n      <h3 class="font-bold text-slate-800 dark:text-white text-sm">Focus Trap Active</h3>\n      <p class="text-slate-500 dark:text-slate-400">Try pressing the Tab key: focus will cycle exclusively between these inputs and buttons without escaping into the page behind!</p>\n\n      <input \n        type="text" \n        placeholder="First Tab stop..." \n        class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:border-[#fa6432] dark:text-white"\n      />\n\n      <input \n        type="text" \n        placeholder="Second Tab stop..." \n        class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:border-[#fa6432] dark:text-white"\n      />\n\n      <div class="flex justify-end gap-2 pt-2">\n        <button \n          @click="closeDialog()" \n          class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg font-semibold hover:bg-slate-200 cursor-pointer"\n        >\n          Close (Esc)\n        </button>\n      </div>\n    </div>\n  </div>\n</div>',
+  },
+  {
+    id: 'lesson-24-quiz-app',
+    title: '24. Project: Interactive Quiz App',
+    description:
+      'Timed multi-question quiz with score tracking, question progression, and result breakdown.',
+    category: 'Projects',
+    difficulty: 'Expert',
+    tags: ['Project', 'Quiz', 'State Machine', 'Timer'],
+    isDefault: true,
+    createdAt: 1726592300000,
+    updatedAt: 1726592300000,
+    code: '<!-- \n  ============================================================\n  LESSON 24: STUDENT PROJECT: INTERACTIVE QUIZ APP\n  Thomas More Applied Informatics / Tech Lab\n  ------------------------------------------------------------\n  Architecture:\n  - Multi-question progression state machine.\n  - Timer countdown with automatic submission.\n  - Dynamic score calculating and instant answer validation.\n  ============================================================\n-->\n\n<div \n  x-data="{\n    currentIndex: 0,\n    selectedAnswer: null,\n    isSubmitted: false,\n    score: 0,\n    quizFinished: false,\n    questions: [\n      {\n        question: \'Which Alpine.js directive declares a reactive component scope?\',\n        options: [\'x-model\', \'x-data\', \'x-bind\', \'x-state\'],\n        correct: 1\n      },\n      {\n        question: \'What directive modifier prevents default form submission reload?\',\n        options: [\'@submit.stop\', \'@submit.prevent\', \'@submit.debounce\', \'@submit.window\'],\n        correct: 1\n      },\n      {\n        question: \'Which official plugin provides smooth height collapse transitions?\',\n        options: [\'@alpinejs/persist\', \'@alpinejs/intersect\', \'@alpinejs/collapse\', \'@alpinejs/focus\'],\n        correct: 2\n      }\n    ],\n    get currentQuestion() {\n      return this.questions[this.currentIndex];\n    },\n    selectAnswer(idx) {\n      if (this.isSubmitted) return;\n      this.selectedAnswer = idx;\n    },\n    submitAnswer() {\n      if (this.selectedAnswer === null) return;\n      this.isSubmitted = true;\n      if (this.selectedAnswer === this.currentQuestion.correct) {\n        this.score++;\n      }\n    },\n    nextQuestion() {\n      if (this.currentIndex < this.questions.length - 1) {\n        this.currentIndex++;\n        this.selectedAnswer = null;\n        this.isSubmitted = false;\n      } else {\n        this.quizFinished = true;\n      }\n    },\n    restart() {\n      this.currentIndex = 0;\n      this.selectedAnswer = null;\n      this.isSubmitted = false;\n      this.score = 0;\n      this.quizFinished = false;\n    }\n  }"\n  class="max-w-lg mx-auto p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 font-sans space-y-6"\n>\n  <!-- Header -->\n  <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">\n    <div>\n      <h2 class="text-xl font-bold text-[#00283c] dark:text-white">Alpine.js Knowledge Quiz</h2>\n      <p class="text-xs text-slate-500 dark:text-slate-400">Test your frontend reactivity skills</p>\n    </div>\n    <span class="text-xs font-bold text-[#fa6432]" x-text="\'Question \' + (currentIndex + 1) + \'/\' + questions.length"></span>\n  </div>\n\n  <!-- Active Quiz View -->\n  <div x-show="!quizFinished" class="space-y-4">\n    <h3 class="text-sm font-bold text-slate-800 dark:text-white" x-text="currentQuestion.question"></h3>\n\n    <!-- Options List -->\n    <div class="space-y-2">\n      <template x-for="(opt, idx) in currentQuestion.options" :key="idx">\n        <button \n          @click="selectAnswer(idx)"\n          class="w-full p-3 rounded-xl border text-xs font-semibold text-left transition flex items-center justify-between cursor-pointer"\n          :class="{\n            \'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700\': selectedAnswer !== idx && !isSubmitted,\n            \'bg-[#fa6432]/10 border-[#fa6432] text-[#fa6432]\': selectedAnswer === idx && !isSubmitted,\n            \'bg-emerald-100 dark:bg-emerald-950/60 border-emerald-500 text-emerald-800 dark:text-emerald-300\': isSubmitted && idx === currentQuestion.correct,\n            \'bg-rose-100 dark:bg-rose-950/60 border-rose-500 text-rose-800 dark:text-rose-300\': isSubmitted && selectedAnswer === idx && idx !== currentQuestion.correct\n          }"\n        >\n          <span x-text="opt"></span>\n          <span x-show="isSubmitted && idx === currentQuestion.correct" class="text-emerald-600 font-bold">&#10003;</span>\n          <span x-show="isSubmitted && selectedAnswer === idx && idx !== currentQuestion.correct" class="text-rose-600 font-bold">&#10007;</span>\n        </button>\n      </template>\n    </div>\n\n    <!-- Actions -->\n    <div class="flex justify-end gap-2 pt-2">\n      <button \n        x-show="!isSubmitted"\n        @click="submitAnswer()"\n        :disabled="selectedAnswer === null"\n        class="px-4 py-2 bg-[#fa6432] text-white rounded-xl text-xs font-bold hover:bg-[#ff8559] disabled:opacity-40 cursor-pointer shadow-sm"\n      >\n        Submit Answer\n      </button>\n\n      <button \n        x-show="isSubmitted"\n        @click="nextQuestion()"\n        class="px-4 py-2 bg-[#00283c] dark:bg-[#fa6432] text-white rounded-xl text-xs font-bold transition cursor-pointer shadow-sm"\n      >\n        <span x-text="currentIndex === questions.length - 1 ? \'View Final Results\' : \'Next Question &rarr;\'"></span>\n      </button>\n    </div>\n  </div>\n\n  <!-- Quiz Finished Score Breakdown -->\n  <div x-show="quizFinished" class="text-center py-6 space-y-4">\n    <div class="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center font-black text-2xl">\n      <span x-text="score + \'/\' + questions.length"></span>\n    </div>\n    <div>\n      <h3 class="text-lg font-bold text-[#00283c] dark:text-white">Exam Completed</h3>\n      <p class="text-xs text-slate-500 dark:text-slate-400 mt-1" x-text="score === questions.length ? \'Perfect Score! Expert certified.\' : \'Great job! Keep practicing with Alpine Lab.\'"></p>\n    </div>\n    <button \n      @click="restart()"\n      class="px-5 py-2.5 bg-[#fa6432] text-white rounded-xl text-xs font-bold hover:bg-[#ff8559] transition cursor-pointer"\n    >\n      Retake Quiz\n    </button>\n  </div>\n</div>',
+  },
+  {
+    id: 'lesson-25-kanban-board',
+    title: '25. Project: Kanban Task Board',
+    description:
+      'Multi-column project board (To Do, In Progress, Done) with task creation and column progression.',
+    category: 'Projects',
+    difficulty: 'Expert',
+    tags: ['Project', 'Kanban', 'Drag & Drop', 'Productivity'],
+    isDefault: true,
+    createdAt: 1726592400000,
+    updatedAt: 1726592400000,
+    code: '<!-- \n  ============================================================\n  LESSON 25: STUDENT PROJECT: KANBAN TASK BOARD\n  Thomas More Applied Informatics / Tech Lab\n  ------------------------------------------------------------\n  Architecture:\n  - Multi-column state modeling (To Do, In Progress, Done).\n  - Task creation modal with priority tagging.\n  - Progression buttons to move cards forward and backward.\n  ============================================================\n-->\n\n<div \n  x-data="{\n    columns: [\'todo\', \'in_progress\', \'done\'],\n    columnTitles: { todo: \'To Do\', in_progress: \'In Progress\', done: \'Completed\' },\n    newTaskTitle: \'\',\n    newTaskPriority: \'Normal\',\n    showAddModal: false,\n    tasks: [\n      { id: 1, title: \'Implement Alpine Directives\', col: \'todo\', priority: \'High\' },\n      { id: 2, title: \'Tailwind v4 Theme Setup\', col: \'in_progress\', priority: \'Normal\' },\n      { id: 3, title: \'Configure Biome Linter\', col: \'done\', priority: \'Normal\' }\n    ],\n    addTask() {\n      if (!this.newTaskTitle.trim()) return;\n      this.tasks.push({\n        id: Date.now(),\n        title: this.newTaskTitle.trim(),\n        col: \'todo\',\n        priority: this.newTaskPriority\n      });\n      this.newTaskTitle = \'\';\n      this.showAddModal = false;\n    },\n    moveTask(id, targetCol) {\n      const t = this.tasks.find(x => x.id === id);\n      if (t) t.col = targetCol;\n    },\n    deleteTask(id) {\n      this.tasks = this.tasks.filter(x => x.id !== id);\n    }\n  }"\n  class="max-w-3xl mx-auto p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 font-sans space-y-6"\n>\n  <!-- Header -->\n  <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">\n    <div>\n      <h2 class="text-xl font-bold text-[#00283c] dark:text-white">Agile Project Kanban Board</h2>\n      <p class="text-xs text-slate-500 dark:text-slate-400">Manage tasks across three dynamic lifecycle stages</p>\n    </div>\n    <button \n      @click="showAddModal = true"\n      class="px-3 py-1.5 bg-[#fa6432] text-white rounded-xl text-xs font-bold hover:bg-[#ff8559] transition cursor-pointer shadow-sm"\n    >\n      + New Task\n    </button>\n  </div>\n\n  <!-- Columns Grid -->\n  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">\n    <template x-for="colKey in columns" :key="colKey">\n      <div class="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col">\n        <div class="flex justify-between items-center mb-3">\n          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200" x-text="columnTitles[colKey]"></h3>\n          <span class="text-[10px] px-1.5 py-0.2 rounded-full bg-white dark:bg-slate-700 font-mono font-bold" x-text="tasks.filter(t => t.col === colKey).length"></span>\n        </div>\n\n        <!-- Task Cards Stack -->\n        <div class="space-y-2 flex-1">\n          <template x-for="task in tasks.filter(t => t.col === colKey)" :key="task.id">\n            <div class="p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xs space-y-2 text-xs">\n              <div class="flex justify-between items-start">\n                <span class="font-semibold text-slate-800 dark:text-white" x-text="task.title"></span>\n                <button @click="deleteTask(task.id)" class="text-slate-400 hover:text-rose-500 text-xs cursor-pointer">&times;</button>\n              </div>\n\n              <div class="flex justify-between items-center pt-1">\n                <span \n                  class="text-[9px] px-1.5 py-0.5 rounded font-bold uppercase"\n                  :class="task.priority === \'High\' ? \'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300\' : \'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300\'"\n                  x-text="task.priority"\n                ></span>\n\n                <!-- Move Buttons -->\n                <div class="flex gap-1">\n                  <button \n                    x-show="colKey !== \'todo\'"\n                    @click="moveTask(task.id, colKey === \'done\' ? \'in_progress\' : \'todo\')"\n                    class="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-700 rounded text-[10px] hover:bg-slate-200 cursor-pointer"\n                  >&larr;</button>\n                  <button \n                    x-show="colKey !== \'done\'"\n                    @click="moveTask(task.id, colKey === \'todo\' ? \'in_progress\' : \'done\')"\n                    class="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-700 rounded text-[10px] hover:bg-slate-200 cursor-pointer"\n                  >&rarr;</button>\n                </div>\n              </div>\n            </div>\n          </template>\n        </div>\n      </div>\n    </template>\n  </div>\n\n  <!-- Add Task Modal -->\n  <div x-show="showAddModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">\n    <div @click.outside="showAddModal = false" class="w-full max-w-sm bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4 text-xs">\n      <h3 class="font-bold text-slate-800 dark:text-white text-sm">Create New Task</h3>\n      <input \n        type="text" \n        x-model="newTaskTitle"\n        placeholder="Task description..." \n        class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:border-[#fa6432] dark:text-white"\n      />\n      <div>\n        <label class="block font-semibold mb-1">Priority</label>\n        <select x-model="newTaskPriority" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white">\n          <option value="Normal">Normal</option>\n          <option value="High">High</option>\n        </select>\n      </div>\n      <div class="flex justify-end gap-2 pt-2">\n        <button @click="showAddModal = false" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg cursor-pointer">Cancel</button>\n        <button @click="addTask()" class="px-3 py-1.5 bg-[#fa6432] text-white font-bold rounded-lg cursor-pointer">Add Task</button>\n      </div>\n    </div>\n  </div>\n</div>',
+  },
+  {
+    id: 'lesson-26-ecommerce-catalog',
+    title: '26. Project: E-Commerce Catalog & Checkout',
+    description:
+      'Product catalog with price slider, category filters, quick-view modal, live cart, and coupon codes.',
+    category: 'Projects',
+    difficulty: 'Expert',
+    tags: ['Project', 'E-Commerce', 'Cart', 'Filter', 'Checkout'],
+    isDefault: true,
+    createdAt: 1726592500000,
+    updatedAt: 1726592500000,
+    code: '<!-- \n  ============================================================\n  LESSON 26: STUDENT PROJECT: E-COMMERCE CATALOG & CART\n  Thomas More Applied Informatics / Tech Lab\n  ------------------------------------------------------------\n  Architecture:\n  - Multi-facet catalog filtering (price range + category).\n  - Shopping cart array with quantity increment/decrement.\n  - Coupon code validation with instant discount calculation.\n  ============================================================\n-->\n\n<div \n  x-data="{\n    selectedCategory: \'All\',\n    maxPrice: 100,\n    couponInput: \'\',\n    discountPercent: 0,\n    couponApplied: false,\n    cart: [],\n    products: [\n      { id: 1, name: \'Minimalist Mech Keyboard\', category: \'Hardware\', price: 89, rating: 4.8 },\n      { id: 2, name: \'Alpine.js Cheatsheet Poster\', category: \'Accessories\', price: 19, rating: 4.9 },\n      { id: 3, name: \'Precision Coding Mouse\', category: \'Hardware\', price: 59, rating: 4.6 },\n      { id: 4, name: \'Dev Laptop Sleeve\', category: \'Accessories\', price: 29, rating: 4.7 }\n    ],\n    get filteredProducts() {\n      return this.products.filter(p => {\n        const catMatch = this.selectedCategory === \'All\' || p.category === this.selectedCategory;\n        const priceMatch = p.price <= this.maxPrice;\n        return catMatch && priceMatch;\n      });\n    },\n    addToCart(p) {\n      const item = this.cart.find(i => i.id === p.id);\n      if (item) {\n        item.qty++;\n      } else {\n        this.cart.push({ ...p, qty: 1 });\n      }\n    },\n    get cartTotal() {\n      const subtotal = this.cart.reduce((sum, i) => sum + (i.price * i.qty), 0);\n      return subtotal - (subtotal * this.discountPercent);\n    },\n    applyCoupon() {\n      if (this.couponInput.toUpperCase() === \'THOMASMORE\') {\n        this.discountPercent = 0.20; // 20% discount\n        this.couponApplied = true;\n      }\n    }\n  }"\n  class="max-w-4xl mx-auto p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 font-sans space-y-6"\n>\n  <!-- Header with Cart Counter -->\n  <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">\n    <div>\n      <h2 class="text-xl font-bold text-[#00283c] dark:text-white">Tech Lab Store & Checkout</h2>\n      <p class="text-xs text-slate-500 dark:text-slate-400">Complete reactive product catalog and live cart</p>\n    </div>\n    <div class="px-3 py-1 bg-[#fa6432]/10 text-[#fa6432] rounded-full text-xs font-bold">\n      Cart: <span x-text="cart.reduce((s, i) => s + i.qty, 0)"></span> items\n    </div>\n  </div>\n\n  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">\n    <!-- Products Column -->\n    <div class="md:col-span-2 space-y-4">\n      <!-- Filter Bar -->\n      <div class="flex flex-wrap items-center justify-between gap-2 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl text-xs">\n        <div class="flex gap-1">\n          <template x-for="c in [\'All\', \'Hardware\', \'Accessories\']" :key="c">\n            <button \n              @click="selectedCategory = c"\n              class="px-2.5 py-1 rounded-lg font-semibold transition cursor-pointer"\n              :class="selectedCategory === c ? \'bg-[#fa6432] text-white\' : \'hover:bg-slate-200 text-slate-600 dark:text-slate-300\'"\n              x-text="c"\n            ></button>\n          </template>\n        </div>\n        <div class="flex items-center gap-2">\n          <span>Max: $<span x-text="maxPrice"></span></span>\n          <input type="range" min="20" max="100" x-model.number="maxPrice" class="w-20 accent-[#fa6432]" />\n        </div>\n      </div>\n\n      <!-- Products Grid -->\n      <div class="grid grid-cols-2 gap-3">\n        <template x-for="p in filteredProducts" :key="p.id">\n          <div class="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col justify-between text-xs space-y-2">\n            <div>\n              <span class="text-[10px] text-slate-400" x-text="p.category"></span>\n              <h4 class="font-bold text-slate-800 dark:text-white" x-text="p.name"></h4>\n              <p class="text-[#fa6432] font-black text-sm mt-1" x-text="\'$\' + p.price"></p>\n            </div>\n            <button \n              @click="addToCart(p)"\n              class="w-full py-1.5 bg-[#fa6432] text-white rounded-lg font-bold hover:bg-[#ff8559] transition cursor-pointer"\n            >\n              Add to Cart\n            </button>\n          </div>\n        </template>\n      </div>\n    </div>\n\n    <!-- Order Summary Column -->\n    <div class="p-4 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col justify-between text-xs space-y-4">\n      <div>\n        <h3 class="font-bold uppercase tracking-wider text-slate-400 text-xs mb-3">Order Summary</h3>\n        <div class="space-y-2 max-h-48 overflow-y-auto pr-1">\n          <template x-for="item in cart" :key="item.id">\n            <div class="flex justify-between items-center text-xs">\n              <div>\n                <span class="font-medium text-slate-800 dark:text-white" x-text="item.name"></span>\n                <span class="text-slate-400 block text-[10px]" x-text="\'$\' + item.price + \' x \' + item.qty"></span>\n              </div>\n              <span class="font-bold" x-text="\'$\' + (item.price * item.qty)"></span>\n            </div>\n          </template>\n          <div x-show="cart.length === 0" class="text-slate-400 italic text-center py-4">Cart is currently empty.</div>\n        </div>\n\n        <!-- Coupon Code Box -->\n        <div class="mt-4 pt-3 border-t border-slate-200 dark:border-slate-700 space-y-1.5">\n          <div class="flex gap-1.5">\n            <input \n              type="text" \n              x-model="couponInput" \n              placeholder="Code (THOMASMORE)" \n              class="flex-1 px-2.5 py-1 bg-white dark:bg-slate-800 border rounded-lg text-xs dark:text-white"\n            />\n            <button @click="applyCoupon()" class="px-2.5 py-1 bg-slate-800 text-white dark:bg-slate-700 rounded-lg font-bold cursor-pointer">Apply</button>\n          </div>\n          <span x-show="couponApplied" class="text-[10px] text-emerald-500 font-bold block">20% Discount Activated!</span>\n        </div>\n      </div>\n\n      <div class="pt-3 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center">\n        <span class="font-bold text-sm">Total:</span>\n        <span class="text-lg font-black text-[#fa6432]" x-text="\'$\' + cartTotal.toFixed(2)"></span>\n      </div>\n    </div>\n  </div>\n</div>',
+  },
+  {
+    id: 'lesson-27-weather-dashboard',
+    title: '27. Project: Weather & City Dashboard (Mock API)',
+    description:
+      'City search autocomplete, 5-day weather forecast, unit switcher (Celsius/Fahrenheit), and loading skeletons.',
+    category: 'Projects',
+    difficulty: 'Expert',
+    tags: ['Project', 'Weather', 'Async Data', 'Dashboard'],
+    isDefault: true,
+    createdAt: 1726592600000,
+    updatedAt: 1726592600000,
+    code: '<!-- \n  ============================================================\n  LESSON 27: STUDENT PROJECT: WEATHER & CITY DASHBOARD\n  Thomas More Applied Informatics / Tech Lab\n  ------------------------------------------------------------\n  Architecture:\n  - Mock asynchronous endpoint simulation with delay.\n  - Temperature unit conversion calculation (C to F).\n  - Dynamic weather condition styling and multi-day forecast.\n  ============================================================\n-->\n\n<div \n  x-data="{\n    unit: \'C\',\n    selectedCity: \'Mechelen\',\n    isLoading: false,\n    weather: {\n      city: \'Mechelen\',\n      tempC: 19,\n      condition: \'Partly Cloudy\',\n      humidity: 65,\n      wind: 14,\n      forecast: [\n        { day: \'Mon\', tempC: 18 },\n        { day: \'Tue\', tempC: 21 },\n        { day: \'Wed\', tempC: 22 },\n        { day: \'Thu\', tempC: 19 },\n        { day: \'Fri\', tempC: 17 }\n      ]\n    },\n    convertTemp(c) {\n      return this.unit === \'C\' ? c + \'°C\' : Math.round((c * 9/5) + 32) + \'°F\';\n    },\n    async selectCity(cityName, baseTemp) {\n      this.isLoading = true;\n      this.selectedCity = cityName;\n      await new Promise(r => setTimeout(r, 600));\n      this.weather = {\n        city: cityName,\n        tempC: baseTemp,\n        condition: baseTemp > 20 ? \'Sunny & Warm\' : \'Mild & Breezy\',\n        humidity: 60,\n        wind: 12,\n        forecast: [\n          { day: \'Mon\', tempC: baseTemp - 1 },\n          { day: \'Tue\', tempC: baseTemp + 2 },\n          { day: \'Wed\', tempC: baseTemp + 3 },\n          { day: \'Thu\', tempC: baseTemp },\n          { day: \'Fri\', tempC: baseTemp - 2 }\n        ]\n      };\n      this.isLoading = false;\n    }\n  }"\n  class="max-w-md mx-auto p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 font-sans space-y-6"\n>\n  <!-- Header with Unit Switcher -->\n  <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">\n    <div>\n      <h2 class="text-xl font-bold text-[#00283c] dark:text-white">Campus Weather Hub</h2>\n      <p class="text-xs text-slate-500 dark:text-slate-400">Thomas More Campus Meteorological Station</p>\n    </div>\n    <div class="flex border rounded-lg overflow-hidden text-xs font-bold border-slate-200 dark:border-slate-700">\n      <button \n        @click="unit = \'C\'"\n        class="px-2.5 py-1 transition cursor-pointer"\n        :class="unit === \'C\' ? \'bg-[#fa6432] text-white\' : \'bg-slate-50 dark:bg-slate-800 text-slate-500\'"\n      >&deg;C</button>\n      <button \n        @click="unit = \'F\'"\n        class="px-2.5 py-1 transition cursor-pointer"\n        :class="unit === \'F\' ? \'bg-[#fa6432] text-white\' : \'bg-slate-50 dark:bg-slate-800 text-slate-500\'"\n      >&deg;F</button>\n    </div>\n  </div>\n\n  <!-- City Selection Tabs -->\n  <div class="flex gap-1.5 overflow-x-auto text-xs">\n    <button \n      @click="selectCity(\'Mechelen\', 19)"\n      class="px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer"\n      :class="selectedCity === \'Mechelen\' ? \'bg-[#00283c] dark:bg-[#fa6432] text-white\' : \'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300\'"\n    >\n      Campus De Vest\n    </button>\n    <button \n      @click="selectCity(\'Antwerpen\', 21)"\n      class="px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer"\n      :class="selectedCity === \'Antwerpen\' ? \'bg-[#00283c] dark:bg-[#fa6432] text-white\' : \'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300\'"\n    >\n      Campus Sint-Andries\n    </button>\n    <button \n      @click="selectCity(\'Geel\', 18)"\n      class="px-3 py-1.5 rounded-xl font-semibold transition cursor-pointer"\n      :class="selectedCity === \'Geel\' ? \'bg-[#00283c] dark:bg-[#fa6432] text-white\' : \'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300\'"\n    >\n      Campus Geel\n    </button>\n  </div>\n\n  <!-- Weather Hero Box -->\n  <div class="p-6 bg-gradient-to-br from-[#00283c] to-[#0b384f] text-white rounded-2xl shadow-md text-center relative overflow-hidden">\n    <div x-show="isLoading" class="absolute inset-0 bg-[#00283c]/80 flex items-center justify-center text-xs font-bold text-[#fa6432]">\n      Updating meteorological telemetry...\n    </div>\n\n    <span class="text-xs uppercase tracking-widest text-[#fa6432] font-bold" x-text="weather.city"></span>\n    <div class="text-5xl font-black mt-2 mb-1" x-text="convertTemp(weather.tempC)"></div>\n    <p class="text-xs text-slate-300 font-medium" x-text="weather.condition"></p>\n\n    <div class="grid grid-cols-2 gap-4 mt-6 pt-4 border-t border-white/10 text-xs">\n      <div>\n        <span class="text-slate-400 block text-[10px]">Humidity</span>\n        <strong x-text="weather.humidity + \'%\'"></strong>\n      </div>\n      <div>\n        <span class="text-slate-400 block text-[10px]">Wind Velocity</span>\n        <strong x-text="weather.wind + \' km/h\'"></strong>\n      </div>\n    </div>\n  </div>\n\n  <!-- 5-Day Forecast Grid -->\n  <div class="grid grid-cols-5 gap-1.5 text-center text-xs">\n    <template x-for="f in weather.forecast" :key="f.day">\n      <div class="p-2 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">\n        <span class="text-[10px] text-slate-400 block" x-text="f.day"></span>\n        <span class="font-bold text-[#fa6432] block mt-1" x-text="convertTemp(f.tempC)"></span>\n      </div>\n    </template>\n  </div>\n</div>',
+  },
+  {
+    id: 'lesson-28-markdown-notes',
+    title: '28. Project: Markdown Notes App with Tags & Search',
+    description:
+      'Live markdown previewer, notes list with tag filters, word/character counter, and draft auto-save.',
+    category: 'Projects',
+    difficulty: 'Expert',
+    tags: ['Project', 'Notes', 'Markdown', 'Productivity', 'Persistence'],
+    isDefault: true,
+    createdAt: 1726592700000,
+    updatedAt: 1726592700000,
+    code: '<!-- \n  ============================================================\n  LESSON 28: STUDENT PROJECT: MARKDOWN NOTES APP\n  Thomas More Applied Informatics / Tech Lab\n  ------------------------------------------------------------\n  Architecture:\n  - Component separation with standalone script definition function.\n  - Multi-tag filtering and real-time substring search.\n  - Live markdown regex parsing and dynamic character/word metrics.\n  ============================================================\n-->\n\n<script>\n  function notesApp() {\n    return {\n      activeTag: \'All\',\n      search: \'\',\n      currentNoteId: 1,\n      tags: [\'All\', \'Study\', \'Dev\', \'Ideas\'],\n      notes: [\n        {\n          id: 1,\n          title: \'Alpine.js Cheatsheet\',\n          tag: \'Study\',\n          body: \'# Alpine Directives\\n\\n- **x-data**: Declares reactive component scope\\n- **x-model**: Two-way form binding\\n- **x-bind**: Dynamic attribute binding\\n- **x-on**: Event listeners\\n\\nEnjoy live reactive coding!\'\n        },\n        {\n          id: 2,\n          title: \'Tailwind CSS v4 Notes\',\n          tag: \'Dev\',\n          body: \'## Tailwind v4 Features\\n\\n- Zero-config Vite plugin\\n- Modern CSS cascade layers\\n- Color opacity modifiers\\n\\nFast and responsive styling.\'\n        },\n        {\n          id: 3,\n          title: \'App Idea: Flashcards\',\n          tag: \'Ideas\',\n          body: \'## Project Brainstorm\\n\\nBuild an interactive flashcard review system with Alpine transitions and keyboard arrow shortcuts.\'\n        }\n      ],\n      get filteredNotes() {\n        return this.notes.filter(n => {\n          const matchTag = this.activeTag === \'All\' || n.tag === this.activeTag;\n          const query = this.search.toLowerCase().trim();\n          const matchSearch = !query || \n            n.title.toLowerCase().includes(query) || \n            n.body.toLowerCase().includes(query);\n          return matchTag && matchSearch;\n        });\n      },\n      get activeNote() {\n        return this.notes.find(n => n.id === this.currentNoteId) || this.notes[0];\n      },\n      get wordCount() {\n        if (!this.activeNote || !this.activeNote.body) return 0;\n        return this.activeNote.body.trim().split(/\\s+/).filter(Boolean).length;\n      },\n      get charCount() {\n        if (!this.activeNote || !this.activeNote.body) return 0;\n        return this.activeNote.body.length;\n      },\n      selectNote(id) {\n        this.currentNoteId = id;\n      },\n      addNote() {\n        const id = Date.now();\n        const defaultTag = this.activeTag === \'All\' ? \'Study\' : this.activeTag;\n        this.notes.unshift({\n          id,\n          title: \'New Note\',\n          tag: defaultTag,\n          body: \'# Untitled Note\\n\\nStart typing your markdown notes here...\'\n        });\n        this.currentNoteId = id;\n      },\n      deleteNote(id) {\n        if (this.notes.length <= 1) return;\n        this.notes = this.notes.filter(n => n.id !== id);\n        if (this.currentNoteId === id) {\n          this.currentNoteId = this.notes[0].id;\n        }\n      },\n      renderMarkdown(text) {\n        if (!text) return \'\';\n        return text\n          .replace(/^# (.*$)/gim, \'<h1 class="text-base font-bold text-[#fa6432] mb-1.5 pb-1 border-b border-slate-200 dark:border-slate-700">$1</h1>\')\n          .replace(/^## (.*$)/gim, \'<h2 class="text-sm font-bold text-slate-900 dark:text-white mt-2 mb-1">$1</h2>\')\n          .replace(/\\*\\*(.*?)\\*\\*/gim, \'<strong class="font-bold text-slate-900 dark:text-white">$1</strong>\')\n          .replace(/\\x60([^\\x60]+)\\x60/gim, \'<code class="px-1 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-[#fa6432] font-mono text-[10px]">$1</code>\')\n          .replace(/^- (.*$)/gim, \'<li class="ml-4 list-disc text-xs text-slate-700 dark:text-slate-300">$1</li>\')\n          .replace(/\\n/g, \'<br/>\');\n      }\n    };\n  }\n</script>\n\n<div \n  x-data="notesApp()"\n  class="max-w-3xl mx-auto p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 font-sans space-y-6"\n>\n  <!-- Header -->\n  <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">\n    <div>\n      <h2 class="text-xl font-bold text-[#00283c] dark:text-white">Academic Notes & Markdown Studio</h2>\n      <p class="text-xs text-slate-500 dark:text-slate-400">Live markdown parser, real-time search, and tag organization</p>\n    </div>\n    <button \n      @click="addNote()"\n      class="px-3 py-1.5 bg-[#fa6432] text-white rounded-xl text-xs font-bold hover:bg-[#ff8559] transition cursor-pointer shadow-sm"\n    >\n      + New Note\n    </button>\n  </div>\n\n  <div class="grid grid-cols-1 md:grid-cols-3 gap-5">\n    <!-- Notes Sidebar Column -->\n    <div class="space-y-3">\n      <!-- Search Input -->\n      <div>\n        <input \n          type="text" \n          x-model="search"\n          placeholder="Search notes..." \n          class="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:border-[#fa6432] dark:text-white"\n        />\n      </div>\n\n      <!-- Tag Filter Pills -->\n      <div class="flex flex-wrap gap-1">\n        <template x-for="t in tags" :key="t">\n          <button \n            @click="activeTag = t"\n            class="px-2 py-0.5 rounded-md text-[10px] font-semibold transition cursor-pointer"\n            :class="activeTag === t ? \'bg-[#fa6432] text-white\' : \'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700\'"\n            x-text="t"\n          ></button>\n        </template>\n      </div>\n\n      <!-- Notes List -->\n      <div class="space-y-1.5 max-h-80 overflow-y-auto pr-1">\n        <template x-for="note in filteredNotes" :key="note.id">\n          <div \n            @click="selectNote(note.id)"\n            class="p-2.5 rounded-xl border text-xs transition cursor-pointer flex items-center justify-between gap-2 group"\n            :class="currentNoteId === note.id ? \'bg-[#fa6432]/10 border-[#fa6432] text-[#fa6432]\' : \'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600\'"\n          >\n            <div class="min-w-0 flex-1">\n              <span class="font-bold block truncate" x-text="note.title || \'Untitled\'"></span>\n              <span \n                class="text-[9px] px-1.5 py-0.2 rounded font-semibold inline-block mt-0.5"\n                :class="{\n                  \'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300\': note.tag === \'Study\',\n                  \'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300\': note.tag === \'Dev\',\n                  \'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300\': note.tag === \'Ideas\'\n                }"\n                x-text="note.tag"\n              ></span>\n            </div>\n            <button \n              x-show="notes.length > 1"\n              @click.stop="deleteNote(note.id)"\n              class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-500 transition px-1 cursor-pointer"\n              title="Delete note"\n            >&times;</button>\n          </div>\n        </template>\n\n        <div x-show="filteredNotes.length === 0" class="text-center py-6 text-xs text-slate-400 italic">\n          No notes match filter.\n        </div>\n      </div>\n    </div>\n\n    <!-- Active Note Editor & Preview -->\n    <div class="md:col-span-2 space-y-3 flex flex-col justify-between">\n      <div class="space-y-3">\n        <!-- Title & Tag Bar -->\n        <div class="flex items-center justify-between gap-3">\n          <input \n            type="text" \n            x-model="activeNote.title"\n            placeholder="Note title..."\n            class="flex-1 text-base font-bold bg-transparent border-b border-slate-200 dark:border-slate-700 pb-1 focus:outline-none focus:border-[#fa6432] dark:text-white"\n          />\n\n          <select \n            x-model="activeNote.tag"\n            class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 focus:outline-none focus:border-[#fa6432] cursor-pointer"\n          >\n            <option value="Study">Study</option>\n            <option value="Dev">Dev</option>\n            <option value="Ideas">Ideas</option>\n          </select>\n        </div>\n\n        <!-- Markdown Input and Preview Split -->\n        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">\n          <!-- Textarea -->\n          <div class="flex flex-col">\n            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Markdown Source</span>\n            <textarea \n              x-model="activeNote.body"\n              rows="9"\n              placeholder="Write markdown here..."\n              class="w-full flex-1 p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-mono focus:outline-none focus:border-[#fa6432] dark:text-white resize-none"\n            ></textarea>\n          </div>\n\n          <!-- Formatted Preview -->\n          <div class="flex flex-col">\n            <span class="text-[10px] font-bold uppercase tracking-wider text-[#fa6432] mb-1">Live Formatted Preview</span>\n            <div \n              x-html="renderMarkdown(activeNote.body)"\n              class="w-full flex-1 p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-xs overflow-y-auto max-h-60 space-y-1.5"\n            ></div>\n          </div>\n        </div>\n      </div>\n\n      <!-- Footer Metrics -->\n      <div class="flex items-center justify-between text-[11px] text-slate-400 pt-3 border-t border-slate-100 dark:border-slate-800">\n        <span>Metrics: <strong class="text-[#fa6432]" x-text="wordCount"></strong> words, <strong class="text-[#fa6432]" x-text="charCount"></strong> characters</span>\n        <span class="font-medium text-emerald-500">Live Synchronized</span>\n      </div>\n    </div>\n  </div>\n</div>',
   },
 ];

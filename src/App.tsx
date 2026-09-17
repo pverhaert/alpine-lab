@@ -28,7 +28,8 @@ export default function App() {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
+          const custom = parsed.filter((s: Snippet) => !s.isDefault);
+          return [...DEFAULT_SNIPPETS, ...custom];
         }
       }
     } catch (e) {
@@ -65,7 +66,17 @@ export default function App() {
     // Check draft or active snippet
     try {
       const savedDraft = localStorage.getItem(STORAGE_KEYS.DRAFT_CODE);
-      if (savedDraft) return savedDraft;
+      if (savedDraft) {
+        // Self-heal stale broken draft of Lesson 28 if present in user storage
+        if (
+          savedDraft.includes('Academic Notes & Markdown Studio') &&
+          !savedDraft.includes('notesApp()')
+        ) {
+          const l28 = DEFAULT_SNIPPETS.find((s) => s.id === 'lesson-28-markdown-notes');
+          if (l28) return l28.code;
+        }
+        return savedDraft;
+      }
     } catch (_e) {}
 
     return DEFAULT_SNIPPETS[0].code;

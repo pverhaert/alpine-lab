@@ -26,14 +26,16 @@
 ### VS Code-Grade Monaco Editor
 
 - Alpine.js Directives Autocompletion: IntelliSense suggestions and built-in documentation for all core directives (`x-data`, `x-bind`, `x-on`, `x-model`, `x-show`, `x-for`, `x-transition`, `x-effect`, `x-ref`, `x-cloak`, `x-teleport`, `x-id`, etc.).
-- Magic Properties IntelliSense: Autocompletion for `$el`, `$refs`, `$store`, `$watch`, `$dispatch`, `$nextTick`, `$root`, `$data`, and `$id`.
-- Emmet Support: Instant HTML and Tailwind abbreviation expansion (e.g., `div.flex.items-center>button.btn*2` + `Tab`).
+- Tailwind CSS v4 IntelliSense & Variants: Comprehensive utility autocompletion with intelligent variant prefix support (`dark:`, `hover:`, `focus:`, `sm:`, `md:`, `lg:`, etc.) and full color palette coverage.
+- Alpine.js Snippets Drawer: Curated library of 25 production-ready components (buttons, modals, drawers, tabs, accordions, dark mode switchers, form validations, toast notifications, search filters, plugin integrations, and full boilerplates) searchable with category filter pills, custom styled scrollbars, and 1-click insertion into the cursor location (shortcut: Ctrl+E).
+- Emmet Expansion: Instant HTML and Tailwind abbreviation expansion via the `Tab` key (e.g., `div.flex.items-center>button.btn*2` + `Tab`, or snippet aliases like `xbtn` + `Tab`).
 - Curated Editor Themes: Switch between **TM Navy** (custom branded dark theme), **VS Dark**, and **VS Light**.
 - Code Formatting & Controls: Automatic formatting, adjustable font sizes, minimap toggle, and line numbers.
 
 ### Instant Sandboxed Preview & Tailwind CSS v4
 
 - Real-Time Tailwind CSS v4: Uses `@tailwindcss/browser@4` to compile arbitrary utilities and custom styles in real time.
+- Class-Based Dark Mode Preview: Fully supports Tailwind CSS v4 dark mode styling (`dark:bg-*`, `dark:text-*`, `dark:border-*`) via `@custom-variant dark` synchronized with preview canvas theme toggling.
 - Pre-Loaded Official Alpine Plugins:
   - `@alpinejs/collapse` (smooth height transitions)
   - `@alpinejs/persist` (seamless `localStorage` binding via `$persist`)
@@ -54,11 +56,39 @@
 
 ### Structured Lessons & Snippet Library
 
-- Pre-built Curriculum: Step-by-step interactive lessons covering:
-  - Fundamentals: Reactive state (`x-data`), events (`@click`), conditionals (`x-show`/`x-if`), lists (`x-for`), two-way binding (`x-model`), and transitions (`x-transition`).
-  - Components: Dropdowns, accessible modals, tabs, accordions, and live filterable lists.
-  - Advanced: Global reactive stores (`Alpine.store`), watchers (`$watch`), custom events (`$dispatch`), and plugins (`$persist`, `x-intersect`, `x-mask`).
-  - Projects: Mini web applications built entirely with Alpine and Tailwind.
+- Pre-built Curriculum: 28 step-by-step interactive lessons ranked systematically from Basic to Expert:
+  - Fundamentals (Beginner, Lessons 01 to 08):
+    - 01. State & Events (`x-data`, `x-on`, `x-text`)
+    - 02. Two-Way Form Binding (`x-model`)
+    - 03. Conditionals & Cloak (`x-show`, `x-if`, `x-cloak`)
+    - 04. Lists & Dynamic Arrays (`x-for`)
+    - 05. Dynamic Attributes & Classes (`:class`, `:disabled`, `:style`)
+    - 06. Event Modifiers (`.prevent`, `.stop`, `.window`, `.debounce`)
+    - 07. HTML Content & Safe Rendering (`x-html` vs `x-text`)
+    - 08. Element References & DOM Access (`$refs`, `$el`)
+  - Components (Intermediate, Lessons 09 to 16):
+    - 09. Transitions & Animations (`x-transition`)
+    - 10. Interactive Dropdown Menu (`@click.outside`)
+    - 11. Tabbed Navigation & Panels
+    - 12. Accordions & Collapsible FAQ (`x-collapse`)
+    - 13. Component Communication (`$dispatch`, Custom Events)
+    - 14. Form Validation & Instant Feedback
+    - 15. Search Filter & Multi-Column Sorting
+    - 16. Toast Notifications System
+  - Advanced (Advanced, Lessons 17 to 23):
+    - 17. State Watchers & Side Effects (`$watch`)
+    - 18. Component Lifecycle (`x-init`, `$nextTick`)
+    - 19. Global State & Stores (`Alpine.store`)
+    - 20. Persistent State with LocalStorage (`$persist`)
+    - 21. Infinite Scroll & Viewport Visibility (`x-intersect`)
+    - 22. Input Masking (`x-mask`)
+    - 23. Accessible Focus Management (`@alpinejs/focus`)
+  - Projects (Expert, Lessons 24 to 28):
+    - 24. Project: Interactive Quiz App
+    - 25. Project: Kanban Task Board
+    - 26. Project: E-Commerce Catalog & Checkout
+    - 27. Project: Weather & City Dashboard (Mock API)
+    - 28. Project: Markdown Notes App with Tags & Search
 - Personal Snippet Manager: Save custom snippets to browser `localStorage`, export/import your snippets as JSON, or clone existing lessons.
 
 ### Interactive Alpine.js Cheat Sheet

@@ -295,9 +295,9 @@ export const PreviewPane: React.FC<Props> = ({
         <div
           className={`h-full transition-all duration-300 rounded-lg overflow-hidden shadow-2xl ${
             viewport === 'mobile'
-              ? 'w-[375px] border-4 border-[#134661] bg-white'
+              ? `w-[375px] border-4 border-[#134661] ${previewTheme === 'dark' ? 'bg-[#0f172a]' : 'bg-white'}`
               : viewport === 'tablet'
-                ? 'w-[768px] border-4 border-[#134661] bg-white'
+                ? `w-[768px] border-4 border-[#134661] ${previewTheme === 'dark' ? 'bg-[#0f172a]' : 'bg-white'}`
                 : 'w-full bg-transparent border-0'
           }`}
         >

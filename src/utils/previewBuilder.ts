@@ -138,21 +138,25 @@ export function generatePreviewHtml(userCode: string, theme: 'light' | 'dark' = 
     userCode.trim().toLowerCase().startsWith('<html');
 
   if (isFullHtml) {
-    // If full HTML document, inject base target and interceptor script safely
+    // If full HTML document, inject base target, custom dark variant, and interceptor script safely
     const baseTag = '<base target="_blank">';
+    const darkVariantStyle =
+      '<style type="text/tailwindcss">@custom-variant dark (&:where(.dark, .dark *));</style>';
+    const darkThemeScript = `<script>if (${theme === 'dark'}) { document.documentElement.classList.add('dark'); } else { document.documentElement.classList.remove('dark'); }</script>`;
+    const fullInjection = `${baseTag}${darkVariantStyle}${darkThemeScript}${PREVIEW_INJECTED_SCRIPT}`;
     if (userCode.includes('</head>')) {
-      return userCode.replace('</head>', `${baseTag}${PREVIEW_INJECTED_SCRIPT}</head>`);
+      return userCode.replace('</head>', `${fullInjection}</head>`);
     } else if (userCode.includes('<body')) {
-      return userCode.replace('<body', `<head>${baseTag}${PREVIEW_INJECTED_SCRIPT}</head><body`);
+      return userCode.replace('<body', `<head>${fullInjection}</head><body`);
     }
-    return baseTag + PREVIEW_INJECTED_SCRIPT + userCode;
+    return fullInjection + userCode;
   }
 
   const bgColor = theme === 'dark' ? '#0f172a' : '#f8fafc';
   const textColor = theme === 'dark' ? '#f1f5f9' : '#1e293b';
 
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="en"${theme === 'dark' ? ' class="dark"' : ''}>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -166,6 +170,9 @@ export function generatePreviewHtml(userCode: string, theme: 'light' | 'dark' = 
 
   <!-- Tailwind CSS v4 Browser Compiler -->
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @custom-variant dark (&:where(.dark, .dark *));
+  </style>
 
   <!-- Alpine.js Plugins (MUST be loaded BEFORE Alpine Core) -->
   <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
@@ -230,6 +237,9 @@ export function exportStandaloneHtml(code: string, title = 'Alpine.js Component'
 
   <!-- Tailwind CSS v4 CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @custom-variant dark (&:where(.dark, .dark *));
+  </style>
 
   <!-- Alpine.js Plugins -->
   <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>

@@ -3,7 +3,7 @@ export interface Snippet {
   title: string;
   description: string;
   category: 'Fundamentals' | 'Components' | 'Advanced' | 'Projects' | 'My Saved';
-  difficulty?: 'Beginner' | 'Intermediate' | 'Advanced';
+  difficulty?: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
   tags: string[];
   code: string;
   isDefault?: boolean;
