@@ -30,7 +30,7 @@
 - Alpine.js Snippets Drawer: Curated library of 25 production-ready components (buttons, modals, drawers, tabs, accordions, dark mode switchers, form validations, toast notifications, search filters, plugin integrations, and full boilerplates) searchable with category filter pills, custom styled scrollbars, and 1-click insertion into the cursor location (shortcut: Ctrl+E).
 - Emmet Expansion: Instant HTML and Tailwind abbreviation expansion via the `Tab` key (e.g., `div.flex.items-center>button.btn*2` + `Tab`, or snippet aliases like `xbtn` + `Tab`).
 - Curated Editor Themes: Switch between **TM Navy** (custom branded dark theme), **VS Dark**, and **VS Light**.
-- Code Formatting & Controls: Automatic formatting, adjustable font sizes, minimap toggle, and line numbers.
+- Code Formatting & Controls: Automatic formatting, projector-friendly bold font toggle (enabled by default), adjustable font sizes, minimap toggle, and line numbers.
 
 ### Instant Sandboxed Preview & Tailwind CSS v4
 

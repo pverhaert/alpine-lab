@@ -1,6 +1,7 @@
 import Editor, { type BeforeMount, type OnMount } from '@monaco-editor/react';
 import {
   AlignLeft,
+  Bold,
   Check,
   Code2,
   Eye,
@@ -38,13 +39,35 @@ export const EditorPane: React.FC<Props> = ({
 }) => {
   const editorRef = useRef<any>(null);
   const monacoRef = useRef<any>(null);
-  const [fontSize, setFontSize] = useState<number>(14);
+  const [fontSize, setFontSize] = useState<number>(16);
+  const [isBold, setIsBold] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('alpine_lab_editor_bold');
+      if (saved !== null) return saved === 'true';
+    } catch (_e) {}
+    return true;
+  });
   const [wordWrap, setWordWrap] = useState<boolean>(true);
   const [minimap, setMinimap] = useState<boolean>(false);
   const [isFormatted, setIsFormatted] = useState(false);
   const [showSnippetsDrawer, setShowSnippetsDrawer] = useState(false);
   const [snippetSearch, setSnippetSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+
+  const handleToggleBold = () => {
+    setIsBold((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('alpine_lab_editor_bold', String(next));
+      } catch (_e) {}
+      if (editorRef.current) {
+        editorRef.current.updateOptions({
+          fontWeight: next ? 'bold' : 'normal',
+        });
+      }
+      return next;
+    });
+  };
 
   const handleEditorWillMount: BeforeMount = (monaco) => {
     setupMonacoAlpine(monaco);
@@ -55,6 +78,9 @@ export const EditorPane: React.FC<Props> = ({
     monacoRef.current = monaco;
     setupMonacoAlpine(monaco);
     monaco.editor.setTheme(theme);
+    editor.updateOptions({
+      fontWeight: isBold ? 'bold' : 'normal',
+    });
 
     // Register full Emmet support: Tab key expansion and context menu
     registerEmmetInMonaco(monaco, editor);
@@ -287,8 +313,34 @@ export const EditorPane: React.FC<Props> = ({
                 <option value={18} className="bg-[#00283c]">
                   18px
                 </option>
+                <option value={20} className="bg-[#00283c]">
+                  20px
+                </option>
+                <option value={22} className="bg-[#00283c]">
+                  22px
+                </option>
+                <option value={24} className="bg-[#00283c]">
+                  24px
+                </option>
+                <option value={26} className="bg-[#00283c]">
+                  26px
+                </option>
               </select>
             </div>
+          </Tooltip>
+
+          {/* Bold Font Toggle */}
+          <Tooltip content={`Bold Font: ${isBold ? 'Enabled' : 'Disabled'}`}>
+            <button
+              id="editor-bold-btn"
+              onClick={handleToggleBold}
+              className={`p-1 rounded transition cursor-pointer flex items-center justify-center ${
+                isBold ? 'text-[#fa6432] bg-[#0b384f]' : 'text-slate-400 hover:text-white'
+              }`}
+              aria-label="Toggle Bold Font"
+            >
+              <Bold className="w-3.5 h-3.5" />
+            </button>
           </Tooltip>
 
           {/* Word Wrap Toggle */}
@@ -438,6 +490,7 @@ export const EditorPane: React.FC<Props> = ({
             fontSize,
             lineHeight: Math.round(fontSize * 1.5),
             fontFamily: "'Fira Code', monospace",
+            fontWeight: isBold ? 'bold' : 'normal',
             fontLigatures: true,
             tabSize: 2,
             insertSpaces: true,
