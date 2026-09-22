@@ -42,7 +42,7 @@ This file contains guidelines, project architecture, and rules for AI agents and
 - public/: Static assets including PWA icons (192x192, 512x512, maskable), favicon, and SVG icons.
 - src/components/: Modular React UI components:
   - Header.tsx: Navigation bar, branding, active snippet picker, export HTML, copy code, modal triggers.
-  - EditorPane.tsx: Monaco editor integration, theme toggle (tm-navy, vs-dark, vs-light), Emmet support, format button, font size adjustments.
+  - EditorPane.tsx: Monaco editor integration, theme toggle (tm-navy, vs-dark, vs-light), zoom controls (Ctrl+Scrollwheel, Ctrl+Plus/Minus on standard and numeric keyboards, reset), Emmet support, format button, font size adjustments.
   - PreviewPane.tsx: Sandboxed iframe preview, responsive device toggles (desktop, tablet, mobile), canvas zoom, dark/light canvas mode, embedded console viewer.
   - AlpineCheatsheetModal.tsx: Directives and magic properties reference modal with 1-click code insertion.
   - SnippetManagerModal.tsx: Lesson and custom snippet manager with category filter, search, clone, delete, and JSON export/import.

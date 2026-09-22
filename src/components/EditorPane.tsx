@@ -12,9 +12,11 @@ import {
   Sparkles,
   Type,
   X,
+  ZoomIn,
+  ZoomOut,
 } from 'lucide-react';
 import type React from 'react';
-import { useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { EditorTheme } from '../types';
 import { EMMET_SNIPPET_CATALOG, registerEmmetInMonaco } from '../utils/emmetHelper';
 import { setupMonacoAlpine } from '../utils/monacoAlpineSetup';
@@ -37,9 +39,23 @@ export const EditorPane: React.FC<Props> = ({
   onSave,
   isSavedFeedback = false,
 }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<any>(null);
   const monacoRef = useRef<any>(null);
+  const zoomDisposableRef = useRef<any>(null);
   const [fontSize, setFontSize] = useState<number>(16);
+  const [zoomLevel, setZoomLevel] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem('alpine_lab_editor_zoom');
+      if (saved !== null) {
+        const parsed = Number(saved);
+        if (!Number.isNaN(parsed) && parsed >= -5 && parsed <= 20) {
+          return parsed;
+        }
+      }
+    } catch (_e) {}
+    return 0;
+  });
   const [isBold, setIsBold] = useState<boolean>(() => {
     try {
       const saved = localStorage.getItem('alpine_lab_editor_bold');
@@ -53,6 +69,116 @@ export const EditorPane: React.FC<Props> = ({
   const [showSnippetsDrawer, setShowSnippetsDrawer] = useState(false);
   const [snippetSearch, setSnippetSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+
+  const zoomPercent = Math.round((1 + zoomLevel * 0.1) * 100);
+
+  const handleZoomIn = useCallback(() => {
+    if (monacoRef.current) {
+      const current = monacoRef.current.editor.EditorZoom.getZoomLevel();
+      const next = Math.min(Math.round(current) + 1, 20);
+      monacoRef.current.editor.EditorZoom.setZoomLevel(next);
+      setZoomLevel(next);
+      try {
+        localStorage.setItem('alpine_lab_editor_zoom', String(next));
+      } catch (_e) {}
+    } else {
+      setZoomLevel((prev) => Math.min(prev + 1, 20));
+    }
+  }, []);
+
+  const handleZoomOut = useCallback(() => {
+    if (monacoRef.current) {
+      const current = monacoRef.current.editor.EditorZoom.getZoomLevel();
+      const next = Math.max(Math.round(current) - 1, -5);
+      monacoRef.current.editor.EditorZoom.setZoomLevel(next);
+      setZoomLevel(next);
+      try {
+        localStorage.setItem('alpine_lab_editor_zoom', String(next));
+      } catch (_e) {}
+    } else {
+      setZoomLevel((prev) => Math.max(prev - 1, -5));
+    }
+  }, []);
+
+  const handleZoomReset = useCallback(() => {
+    if (monacoRef.current) {
+      monacoRef.current.editor.EditorZoom.setZoomLevel(0);
+      setZoomLevel(0);
+      try {
+        localStorage.setItem('alpine_lab_editor_zoom', '0');
+      } catch (_e) {}
+    } else {
+      setZoomLevel(0);
+    }
+  }, []);
+
+  useEffect(() => {
+    const container = containerRef.current;
+
+    const handleContainerWheel = (e: WheelEvent) => {
+      if (!e.ctrlKey && !e.metaKey) return;
+      e.preventDefault();
+
+      // If over Monaco's editor canvas, Monaco's built-in mouseWheelZoom handles it internally
+      const isInsideMonaco = (e.target as HTMLElement | null)?.closest('.monaco-editor');
+      if (isInsideMonaco) {
+        return;
+      }
+
+      if (e.deltaY < 0) {
+        handleZoomIn();
+      } else if (e.deltaY > 0) {
+        handleZoomOut();
+      }
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!e.ctrlKey && !e.metaKey) return;
+
+      const isAdd =
+        e.key === '+' ||
+        e.key === '=' ||
+        e.code === 'NumpadAdd' ||
+        (e.shiftKey && (e.code === 'Equal' || e.key === '+'));
+      const isSubtract =
+        e.key === '-' || e.key === '_' || e.code === 'Minus' || e.code === 'NumpadSubtract';
+      const isReset = e.key === '0' || e.code === 'Digit0' || e.code === 'Numpad0';
+
+      if (!isAdd && !isSubtract && !isReset) return;
+
+      const currentContainer = containerRef.current;
+      if (!currentContainer) return;
+
+      const isInside =
+        currentContainer.contains(document.activeElement) ||
+        currentContainer.contains(e.target as Node) ||
+        currentContainer.matches(':hover');
+
+      if (isInside) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (isAdd) {
+          handleZoomIn();
+        } else if (isSubtract) {
+          handleZoomOut();
+        } else if (isReset) {
+          handleZoomReset();
+        }
+      }
+    };
+
+    if (container) {
+      container.addEventListener('wheel', handleContainerWheel, { passive: false });
+    }
+    window.addEventListener('keydown', handleKeyDown, { capture: true });
+
+    return () => {
+      if (container) {
+        container.removeEventListener('wheel', handleContainerWheel);
+      }
+      window.removeEventListener('keydown', handleKeyDown, { capture: true });
+    };
+  }, [handleZoomIn, handleZoomOut, handleZoomReset]);
 
   const handleToggleBold = () => {
     setIsBold((prev) => {
@@ -82,8 +208,50 @@ export const EditorPane: React.FC<Props> = ({
       fontWeight: isBold ? 'bold' : 'normal',
     });
 
+    // Apply saved or current zoom level
+    monaco.editor.EditorZoom.setZoomLevel(zoomLevel);
+
+    // Subscribe to zoom level changes (such as from mouseWheelZoom)
+    zoomDisposableRef.current = monaco.editor.EditorZoom.onDidChangeZoomLevel(
+      (newLevel: number) => {
+        setZoomLevel(newLevel);
+        try {
+          localStorage.setItem('alpine_lab_editor_zoom', String(newLevel));
+        } catch (_e) {}
+      },
+    );
+
+    editor.onDidDispose(() => {
+      if (zoomDisposableRef.current) {
+        zoomDisposableRef.current.dispose();
+      }
+    });
+
     // Register full Emmet support: Tab key expansion and context menu
     registerEmmetInMonaco(monaco, editor);
+
+    // Add keyboard shortcuts for zoom inside Monaco
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Equal, () => {
+      handleZoomIn();
+    });
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Equal, () => {
+      handleZoomIn();
+    });
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.NumpadAdd, () => {
+      handleZoomIn();
+    });
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Minus, () => {
+      handleZoomOut();
+    });
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.NumpadSubtract, () => {
+      handleZoomOut();
+    });
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit0, () => {
+      handleZoomReset();
+    });
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Numpad0, () => {
+      handleZoomReset();
+    });
 
     // Add keyboard shortcut: Ctrl+E to toggle Alpine Snippets drawer
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyE, () => {
@@ -168,18 +336,64 @@ export const EditorPane: React.FC<Props> = ({
   });
 
   return (
-    <div className="h-full w-full flex flex-col bg-[#001a27] border-r border-[#134661] select-none relative">
+    <div
+      ref={containerRef}
+      className="h-full w-full flex flex-col bg-[#001a27] border-r border-[#134661] select-none relative"
+    >
       {/* Editor Top Toolbar */}
       <div className="h-10 px-3 bg-[#00141f] border-b border-[#134661] flex items-center justify-between gap-2 text-xs text-slate-300">
-        {/* File / Syntax Status */}
+        {/* File / Syntax Status & Zoom Controls */}
         <div className="flex items-center gap-2">
-          <span className="flex items-center gap-1.5 font-bold text-white">
+          <span className="flex items-center gap-1.5 font-bold text-white shrink-0">
             <Code2 className="w-4 h-4 text-[#fa6432]" />
             <span>template.html</span>
           </span>
-          <span className="hidden sm:inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-[#0b384f] text-sky-300 border border-[#134661]">
+          <span className="hidden xl:inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-[#0b384f] text-sky-300 border border-[#134661] shrink-0">
             Alpine.js 3.x + Tailwind v4
           </span>
+
+          {/* Zoom Controls */}
+          <div className="flex items-center bg-[#001c2b] rounded p-0.5 border border-[#134661] shrink-0">
+            <Tooltip content="Zoom Out (Ctrl - or Ctrl+Numpad -)" shortcut="Ctrl -">
+              <button
+                id="editor-zoom-out-btn"
+                type="button"
+                onClick={handleZoomOut}
+                disabled={zoomLevel <= -5}
+                className="p-1 rounded text-slate-400 hover:text-white hover:bg-[#0b384f] disabled:opacity-30 disabled:hover:bg-transparent transition cursor-pointer"
+                aria-label="Zoom Out"
+              >
+                <ZoomOut className="w-3.5 h-3.5" />
+              </button>
+            </Tooltip>
+            <Tooltip content="Reset Zoom to 100% (Ctrl 0 or click)" shortcut="Ctrl 0">
+              <button
+                id="editor-zoom-reset-btn"
+                type="button"
+                onClick={handleZoomReset}
+                className={`px-1.5 py-0.5 text-[11px] font-mono font-medium rounded transition cursor-pointer ${
+                  zoomLevel !== 0
+                    ? 'text-[#fa6432] hover:bg-[#0b384f]'
+                    : 'text-slate-300 hover:text-white hover:bg-[#0b384f]'
+                }`}
+                aria-label="Reset Zoom"
+              >
+                {zoomPercent}%
+              </button>
+            </Tooltip>
+            <Tooltip content="Zoom In (Ctrl + or Ctrl+Numpad +)" shortcut="Ctrl +">
+              <button
+                id="editor-zoom-in-btn"
+                type="button"
+                onClick={handleZoomIn}
+                disabled={zoomLevel >= 20}
+                className="p-1 rounded text-slate-400 hover:text-white hover:bg-[#0b384f] disabled:opacity-30 disabled:hover:bg-transparent transition cursor-pointer"
+                aria-label="Zoom In"
+              >
+                <ZoomIn className="w-3.5 h-3.5" />
+              </button>
+            </Tooltip>
+          </div>
         </div>
 
         {/* Editor Controls Toolbar */}
@@ -498,6 +712,7 @@ export const EditorPane: React.FC<Props> = ({
             minimap: { enabled: minimap },
             scrollBeyondLastLine: false,
             automaticLayout: true,
+            mouseWheelZoom: true,
             renderWhitespace: 'selection',
             bracketPairColorization: { enabled: true },
             formatOnPaste: true,
@@ -536,7 +751,9 @@ export const EditorPane: React.FC<Props> = ({
           <span className="hidden sm:inline text-slate-400">
             Hover directives for tips •{' '}
             <kbd className="px-1 bg-[#0b384f] text-slate-300 rounded text-[10px]">Ctrl+Space</kbd>{' '}
-            suggestions
+            suggestions • Zoom:{' '}
+            <kbd className="px-1 bg-[#0b384f] text-slate-300 rounded text-[10px]">Ctrl+Wheel</kbd> /{' '}
+            <kbd className="px-1 bg-[#0b384f] text-slate-300 rounded text-[10px]">Ctrl +/-</kbd>
           </span>
         </div>
       </div>
